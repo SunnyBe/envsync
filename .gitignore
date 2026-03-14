@@ -36,3 +36,6 @@ Thumbs.db
 
 # Local planning docs
 PLAN.md
+
+# Claude
+.claude/

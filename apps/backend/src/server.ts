@@ -11,6 +11,7 @@ import { errorMiddleware } from './middleware/error.middleware';
 import authRouter from './modules/auth/auth.routes';
 import projectsRouter from './modules/projects/projects.routes';
 import envRouter from './modules/env/env.routes';
+import healthRouter from './modules/health/health.routes';
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
@@ -20,13 +21,11 @@ app.use(pinoHttp({ logger }));
 app.use(cors());
 app.use(express.json());
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
+app.use('/health', healthRouter);
 
-app.use('/register', authRouter);
+app.use('/auth/register', authRouter);
 app.use('/projects', projectsRouter);
-app.use('/env', envRouter);
+app.use('/projects/:projectId/env', envRouter);
 
 app.use(errorMiddleware);
 

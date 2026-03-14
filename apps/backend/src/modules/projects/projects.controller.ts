@@ -1,8 +1,9 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../../middleware/auth.middleware';
 import * as projectsService from './projects.service';
+import { createProjectSchema } from './projects.validation';
 
-export async function list(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+export async function listHandler(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     const projects = await projectsService.listProjects(req.user!.id);
     res.json({ projects });
@@ -11,14 +12,14 @@ export async function list(req: AuthRequest, res: Response, next: NextFunction):
   }
 }
 
-export async function create(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+export async function createHandler(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { name } = req.body;
-    if (!name) {
-      res.status(400).json({ error: 'name is required' });
+    const parsed = createProjectSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0].message });
       return;
     }
-    const project = await projectsService.createProject({ name, ownerId: req.user!.id });
+    const project = await projectsService.createProject({ name: parsed.data.name, ownerId: req.user!.id });
     res.status(201).json({ id: project.id, name: project.name });
   } catch (err) {
     next(err);

@@ -11,6 +11,7 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   apiToken  String   @unique
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
   projects  Project[]
@@ -20,10 +21,13 @@ model Project {
   id        String   @id @default(uuid())
   name      String
   ownerId   String
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
   owner     User          @relation(fields: [ownerId], references: [id])
   variables EnvVariable[]
+
+  @@unique([name, ownerId])
 }
 
 model EnvVariable {
@@ -32,6 +36,7 @@ model EnvVariable {
   key       String
   valueEnc  String
   env       String
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
   project   Project  @relation(fields: [projectId], references: [id])
