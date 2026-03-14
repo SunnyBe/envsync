@@ -22,6 +22,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run backend tests
+        run: npm test --workspace=apps/backend
+        env:
+          ENV_SYNC_SECRET: ${{ secrets.ENV_SYNC_SECRET || 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }}
+          HEALTH_SECRET: test-health-secret
+
       - name: Build all packages
         run: npm run build
 
