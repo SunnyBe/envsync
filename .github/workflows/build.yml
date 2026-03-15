@@ -1,13 +1,14 @@
-name: Build
+name: CI
 
 on:
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  build:
+  lint-and-test:
+    name: Lint & Test
     runs-on: ubuntu-latest
 
     steps:
@@ -22,14 +23,40 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run backend tests
+      - name: Lint backend
+        run: npm run lint --workspace=apps/backend
+
+      - name: Lint web
+        run: npm run lint --workspace=apps/web
+
+      - name: Test backend
         run: npm test --workspace=apps/backend
         env:
           ENV_SYNC_SECRET: ${{ secrets.ENV_SYNC_SECRET || 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }}
           HEALTH_SECRET: test-health-secret
 
-      - name: Build all packages
-        run: npm run build
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build backend
+        run: npm run build --workspace=apps/backend
+
+      - name: Build web
+        run: npm run build --workspace=apps/web
 
       - name: Docker build (backend)
         uses: docker/build-push-action@v5

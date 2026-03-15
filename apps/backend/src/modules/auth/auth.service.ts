@@ -26,7 +26,7 @@ export async function registerUser(input: RegisterInput): Promise<RegisterOutput
   const apiToken = crypto.randomBytes(32).toString('hex');
   const user = await prisma.user.create({ data: { email, apiToken } });
 
-  logger.info({ userId: user.id, email: user.email }, 'User registered');
+  logger.info({ audit: true, action: 'user.register', userId: user.id, email: user.email }, 'audit');
 
   return { id: user.id, email: user.email, apiToken: user.apiToken };
 }

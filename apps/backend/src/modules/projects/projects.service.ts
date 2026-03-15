@@ -23,7 +23,7 @@ export async function createProject(input: CreateProjectInput): Promise<ProjectO
   }
 
   const project = await prisma.project.create({ data: { name, ownerId } });
-  logger.info({ projectId: project.id, ownerId }, 'Project created');
+  logger.info({ audit: true, action: 'project.create', projectId: project.id, ownerId }, 'audit');
   return { id: project.id, name: project.name, createdAt: project.createdAt };
 }
 

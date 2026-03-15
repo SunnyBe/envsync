@@ -13,7 +13,7 @@ export async function pushVariables(input: PushEnvInput): Promise<void> {
       create: { projectId, key, valueEnc, env },
     });
   }
-  logger.info({ projectId, env, count: Object.keys(variables).length }, 'Variables pushed');
+  logger.info({ audit: true, action: 'env.push', projectId, env, count: Object.keys(variables).length }, 'audit');
 }
 
 export async function pullVariables(input: PullEnvInput): Promise<PullEnvOutput> {
@@ -25,6 +25,6 @@ export async function pullVariables(input: PullEnvInput): Promise<PullEnvOutput>
   for (const record of records) {
     variables[record.key] = decrypt(record.valueEnc);
   }
-  logger.info({ projectId, env, count: records.length }, 'Variables pulled');
+  logger.info({ audit: true, action: 'env.pull', projectId, env, count: records.length }, 'audit');
   return { variables };
 }
