@@ -1,11 +1,25 @@
 import { Command } from 'commander';
+import chalk from 'chalk';
 import { saveConfig } from '../config/config';
+import { handleError } from '../utils/error';
+
+interface LoginOptions {
+  token: string;
+  apiUrl: string;
+}
+
+export async function runLogin(opts: LoginOptions): Promise<void> {
+  if (!opts.token.trim()) {
+    throw new Error('Token cannot be empty');
+  }
+  const url = opts.apiUrl.replace(/\/$/, ''); // strip trailing slash
+  saveConfig({ token: opts.token.trim(), apiUrl: url });
+  console.log(chalk.green('✔ Logged in successfully.'));
+  console.log(chalk.dim(`  API: ${url}`));
+}
 
 export const loginCommand = new Command('login')
   .description('Save your API token locally')
   .requiredOption('--token <token>', 'Your EnvSync API token')
-  .option('--api-url <url>', 'API base URL', 'http://localhost:3001')
-  .action((opts) => {
-    saveConfig({ token: opts.token, apiUrl: opts.apiUrl });
-    console.log('Logged in successfully.');
-  });
+  .option('--api-url <url>', 'API base URL', 'https://envsync-api.up.railway.app')
+  .action((opts: LoginOptions) => runLogin(opts).catch(handleError));
