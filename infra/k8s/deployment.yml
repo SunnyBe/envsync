@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envsync-backend
+  namespace: envsync
+spec:
+  replicas: 2 # Run 2 pods - if one dies, one still serves traffic
+  selector:
+    matchLabels:
+      app: envsync-backend # Send traffic to pods with this label
+  
+  template:
+    metadata:
+      labels:
+        app: envsync-backend
+    spec:
+      containers:
+        - name: envsync-backend
+          image: envsync-backend:local
+          imagePullPolicy: Never   # Use local minikube image — don't attempt Docker Hub
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: envsync-config
+          
+          env:
+            - name: ENV_SYNC_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: envsync-secret
+                  key: ENV_SYNC_SECRET
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: envsync-secret
+                  key: DATABASE_URL
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          livenessProbe: # failure allows kubernetes to restart the pod
+            httpGet:
+              path: /health/live
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe: # failure allows kubernetes to remove pod from load balancer
+            httpGet:
+              path: /health/ready
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 2 # After 2 failures, the pod is considered not ready

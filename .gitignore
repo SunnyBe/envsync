@@ -37,5 +37,10 @@ Thumbs.db
 # Local planning docs
 PLAN.md
 
+# Kubernetes secrets — never commit real values
+# Create secrets imperatively: kubectl create secret generic ...
+# Or use Sealed Secrets / External Secrets for GitOps
+infra/k8s/secret.yml
+
 # Claude
 .claude/
