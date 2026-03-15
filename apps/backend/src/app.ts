@@ -12,11 +12,15 @@ import healthRouter from './modules/health/health.routes';
 import authRouter from './modules/auth/auth.routes';
 import projectsRouter from './modules/projects/projects.routes';
 import envRouter from './modules/env/env.routes';
+import metricsRouter from './modules/metrics/metrics.routes';
+import { metricsMiddleware } from './modules/metrics/metrics.middleware';
 
 const app = express();
 
 app.use(requestIdMiddleware);
 app.use(pinoHttp({ logger }));
+// Collect RED metrics for every request — must be registered before route handlers
+app.use(metricsMiddleware);
 // ALLOWED_ORIGINS: comma-separated permitted origins.
 // e.g. "http://localhost:3000,https://envsync.up.railway.app"
 // Falls back to reflecting any origin (true) when the var is not set — safe for local dev only.
@@ -25,6 +29,7 @@ app.use(cors({ origin: allowedOrigins ?? true, credentials: true }));
 app.use(express.json());
 
 app.use('/health', healthRouter);
+app.use('/metrics', metricsRouter);
 app.use('/auth', authRouter);
 app.use('/projects', projectsRouter);
 app.use('/projects/:projectId/env', envRouter);
