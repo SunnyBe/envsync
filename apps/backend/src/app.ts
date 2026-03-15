@@ -17,7 +17,11 @@ const app = express();
 
 app.use(requestIdMiddleware);
 app.use(pinoHttp({ logger }));
-app.use(cors());
+// ALLOWED_ORIGINS: comma-separated permitted origins.
+// e.g. "http://localhost:3000,https://envsync.up.railway.app"
+// Falls back to reflecting any origin (true) when the var is not set — safe for local dev only.
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim());
+app.use(cors({ origin: allowedOrigins ?? true, credentials: true }));
 app.use(express.json());
 
 app.use('/health', healthRouter);
