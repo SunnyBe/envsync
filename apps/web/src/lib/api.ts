@@ -45,10 +45,11 @@ export const register = (email: string) =>
 
 // ── Projects ──────────────────────────────────────────────────────────────────
 
-export const getProjects = () => apiClient.get<Project[]>('/projects').then((r) => r.data);
+export const getProjects = () =>
+  apiClient.get<{ projects: Project[] }>('/projects').then((r) => r.data.projects);
 
 export const createProject = (name: string) =>
-  apiClient.post<Project>('/projects', { name }).then((r) => r.data);
+  apiClient.post<{ id: string; name: string }>('/projects', { name }).then((r) => r.data);
 
 // ── Env Vars ─────────────────────────────────────────────────────────────────
 
