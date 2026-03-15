@@ -1,5 +1,8 @@
 FROM node:20-alpine
 
+# Prisma's schema engine (Rust binary) requires OpenSSL, which Alpine omits by default
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 # Copy monorepo root manifests (for npm workspaces + layer caching)
