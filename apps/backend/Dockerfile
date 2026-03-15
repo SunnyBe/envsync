@@ -28,5 +28,4 @@ RUN chmod +x ./start.sh
 
 EXPOSE 3001
 
-# Use exec in start.sh so node becomes PID 1 (required for proper signal handling and log capture)
 CMD ["./start.sh"]
