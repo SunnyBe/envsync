@@ -6,7 +6,7 @@ import { pushEnvSchema, pullEnvSchema } from './env.validation';
 export async function pushHandler(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     const projectId = req.params.projectId;
-    const parsed = pushEnvSchema.safeParse(req.body);
+    const parsed = pushEnvSchema.safeParse({ env: req.query.env, ...req.body });
     if (!parsed.success) {
       res.status(400).json({ error: parsed.error.issues[0].message });
       return;
