@@ -20,6 +20,7 @@ beforeEach(() => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'envsync-cfg-'));
   // Reset module cache so homedir() mock is picked up freshly
   jest.resetModules();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   ({ saveConfig, loadConfig, clearConfig, configExists } = require('../config'));
 });
 

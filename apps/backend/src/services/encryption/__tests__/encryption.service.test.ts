@@ -16,7 +16,7 @@ let decrypt: (encryptedPayload: string) => string;
 beforeAll(() => {
   process.env.ENV_SYNC_SECRET = TEST_SECRET;
   jest.resetModules();
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const mod = require('../encryption.service');
   encrypt = mod.encrypt;
   decrypt = mod.decrypt;

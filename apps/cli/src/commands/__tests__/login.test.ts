@@ -14,6 +14,7 @@ let runLogin: (opts: { token: string; apiUrl: string }) => Promise<void>;
 beforeEach(() => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'envsync-login-'));
   jest.resetModules();
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   ({ runLogin } = require('../login'));
   jest.spyOn(console, 'log').mockImplementation(() => {});
 });
