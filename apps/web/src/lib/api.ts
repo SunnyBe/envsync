@@ -43,6 +43,13 @@ export type Environment = 'development' | 'staging' | 'production';
 export const register = (email: string) =>
   apiClient.post<RegisterResponse>('/auth/register', { email }).then((r) => r.data);
 
+export const verifyToken = (token: string) =>
+  apiClient
+    .get<{ email: string; id: string }>('/auth/me', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((r) => r.data);
+
 // ── Projects ──────────────────────────────────────────────────────────────────
 
 export const getProjects = () =>

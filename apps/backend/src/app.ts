@@ -25,7 +25,7 @@ app.use(cors({ origin: allowedOrigins ?? true, credentials: true }));
 app.use(express.json());
 
 app.use('/health', healthRouter);
-app.use('/auth/register', authRouter);
+app.use('/auth', authRouter);
 app.use('/projects', projectsRouter);
 app.use('/projects/:projectId/env', envRouter);
 

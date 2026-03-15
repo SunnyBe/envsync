@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/context/AuthContext';
-import { register } from '@/lib/api';
+import { register, verifyToken } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { track } from '@/lib/analytics';
 
 type Tab = 'register' | 'token';
+
+// API tokens are 64 hex characters (32 random bytes)
+const TOKEN_REGEX = /^[0-9a-f]{64}$/i;
 
 export default function LoginPage() {
   const { token, isReady, login } = useAuth();
@@ -16,6 +19,7 @@ export default function LoginPage() {
   const [tab, setTab] = useState<Tab>('register');
   const [email, setEmail] = useState('');
   const [tokenInput, setTokenInput] = useState('');
+  const [tokenError, setTokenError] = useState('');
   const [newToken, setNewToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,13 +44,29 @@ export default function LoginPage() {
     }
   }
 
-  function handleTokenLogin(e: React.FormEvent) {
+  async function handleTokenLogin(e: React.FormEvent) {
     e.preventDefault();
     const t = tokenInput.trim();
     if (!t) return;
-    login(t);
-    track('user_logged_in');
-    router.push('/dashboard');
+
+    // Client-side format check before hitting the network
+    if (!TOKEN_REGEX.test(t)) {
+      setTokenError('Token must be a 64-character hex string.');
+      return;
+    }
+    setTokenError('');
+    setLoading(true);
+
+    try {
+      await verifyToken(t);
+      login(t);
+      track('user_logged_in');
+      router.push('/dashboard');
+    } catch {
+      toast.error('Invalid token. Check that you copied it correctly.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleContinueWithToken() {
@@ -85,6 +105,7 @@ export default function LoginPage() {
                 onClick={() => {
                   setTab(t);
                   setNewToken(null);
+                  setTokenError('');
                 }}
                 className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-colors
                   ${tab === t
@@ -148,13 +169,17 @@ export default function LoginPage() {
                 label="API token"
                 type="password"
                 value={tokenInput}
-                onChange={(e) => setTokenInput(e.target.value)}
-                placeholder="Paste your token here"
+                onChange={(e) => {
+                  setTokenInput(e.target.value);
+                  if (tokenError) setTokenError('');
+                }}
+                placeholder="Paste your 64-character token"
                 required
                 autoFocus
                 hint="You received this when you first registered."
+                error={tokenError}
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" loading={loading} className="w-full">
                 Sign in
               </Button>
             </form>
