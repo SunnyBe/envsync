@@ -10,7 +10,14 @@ import { httpRequestDuration, httpRequestsTotal } from './metrics.service';
  * URL (e.g. "/projects/abc-123") — this prevents high-cardinality label
  * explosion in Prometheus.
  */
+// Paths that are infrastructure/probe traffic — excluded from RED metrics
+const IGNORED_PATHS = ['/metrics', '/health/live', '/health/ready', '/health/system'];
+
 export function metricsMiddleware(req: Request, res: Response, next: NextFunction): void {
+  if (IGNORED_PATHS.some((p) => req.path.startsWith(p))) {
+    return next();
+  }
+
   const endTimer = httpRequestDuration.startTimer();
 
   res.on('finish', () => {
