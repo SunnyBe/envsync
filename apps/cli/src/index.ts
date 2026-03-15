@@ -5,13 +5,14 @@ import { logoutCommand } from './commands/logout';
 import { whoamiCommand } from './commands/whoami';
 import { pushCommand } from './commands/push';
 import { pullCommand } from './commands/pull';
+import { CLI_NAME, CLI_VERSION, CLI_DESCRIPTION } from './meta';
 
 const program = new Command();
 
 program
-  .name('envsync')
-  .description('Sync environment variables across your team')
-  .version('1.0.0');
+  .name(CLI_NAME)
+  .description(CLI_DESCRIPTION)
+  .version(CLI_VERSION);
 
 program.addCommand(loginCommand);
 program.addCommand(logoutCommand);

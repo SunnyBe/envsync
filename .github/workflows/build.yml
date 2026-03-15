@@ -32,6 +32,8 @@ jobs:
       - name: Test backend
         run: npm test --workspace=apps/backend
         env:
+          # Fallback is a dummy 64-char hex string used only for CI test runs.
+          # Set secrets.ENV_SYNC_SECRET in GitHub Settings → Secrets for production deploys.
           ENV_SYNC_SECRET: ${{ secrets.ENV_SYNC_SECRET || 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }}
           HEALTH_SECRET: test-health-secret
 

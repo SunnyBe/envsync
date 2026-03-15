@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { saveConfig } from '../config/config';
 import { handleError } from '../utils/error';
+import { DEFAULT_API_URL } from '../meta';
 
 interface LoginOptions {
   token: string;
@@ -21,5 +22,5 @@ export async function runLogin(opts: LoginOptions): Promise<void> {
 export const loginCommand = new Command('login')
   .description('Save your API token locally')
   .requiredOption('--token <token>', 'Your EnvSync API token')
-  .option('--api-url <url>', 'API base URL', 'https://envsync-api.up.railway.app')
+  .option('--api-url <url>', 'API base URL', DEFAULT_API_URL)
   .action((opts: LoginOptions) => runLogin(opts).catch(handleError));

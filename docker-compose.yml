@@ -2,8 +2,8 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: envsync
-      POSTGRES_PASSWORD: envsync
+      POSTGRES_USER: ${POSTGRES_USER:-envsync}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-envsync}
       POSTGRES_DB: envsync
     ports:
       - "5433:5432"
@@ -17,7 +17,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgresql://envsync:envsync@db:5432/envsync
+      DATABASE_URL: postgresql://${POSTGRES_USER:-envsync}:${POSTGRES_PASSWORD:-envsync}@db:5432/envsync
       ENV_SYNC_SECRET: ${ENV_SYNC_SECRET}
       PORT: 3001
     depends_on:
