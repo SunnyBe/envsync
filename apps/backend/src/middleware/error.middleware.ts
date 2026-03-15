@@ -12,9 +12,10 @@ export function errorMiddleware(
   _next: NextFunction,
 ): void {
   const statusCode = err.statusCode ?? 500;
-  logger.error(
-    { err, requestId: (req as any).id, statusCode },
-    'Unhandled error',
-  );
-  res.status(statusCode).json({ error: err.message });
+  logger.error({ err, requestId: (req as any).id, statusCode }, 'Unhandled error');
+
+  // Never expose internal error details (stack traces, DB errors) to the client.
+  // 4xx errors are intentional and safe to surface; 5xx are internal failures.
+  const clientMessage = statusCode < 500 ? err.message : 'Internal server error';
+  res.status(statusCode).json({ error: clientMessage });
 }
