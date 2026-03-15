@@ -66,3 +66,10 @@ jobs:
           context: .
           file: apps/backend/Dockerfile
           push: false
+
+      - name: Docker build (web)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: false
