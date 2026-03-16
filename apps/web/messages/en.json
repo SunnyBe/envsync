@@ -1,0 +1,128 @@
+{
+  "layout": {
+    "nav": {
+      "projects": "Projects",
+      "settings": "Settings"
+    },
+    "signOut": "Sign out"
+  },
+  "login": {
+    "title": "EnvSync",
+    "subtitle": "Sync environment variables across your team",
+    "tabs": {
+      "register": "Create account",
+      "token": "Sign in with token"
+    },
+    "register": {
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@company.com",
+      "submitButton": "Create account",
+      "success": {
+        "title": "Account created!",
+        "description": "Copy your API token now — it will not be shown again.",
+        "copyButton": "Copy",
+        "copiedButton": "Copied!",
+        "continueButton": "Continue to dashboard"
+      }
+    },
+    "tokenLogin": {
+      "label": "API token",
+      "placeholder": "Paste your 64-character token",
+      "hint": "You received this when you first registered.",
+      "submitButton": "Sign in",
+      "invalidFormat": "Token must be a 64-character hex string.",
+      "invalidToken": "Invalid token. Check that you copied it correctly."
+    },
+    "cliHint": "Using the CLI?",
+    "errors": {
+      "registrationFailed": "Registration failed"
+    }
+  },
+  "dashboard": {
+    "title": "Projects",
+    "subtitle": "Each project holds your encrypted environment variables.",
+    "newProject": "New project",
+    "empty": {
+      "message": "No projects yet",
+      "description": "Create a project to start syncing env vars.",
+      "button": "Create your first project"
+    },
+    "createModal": {
+      "title": "New project",
+      "nameLabel": "Project name",
+      "namePlaceholder": "my-api",
+      "nameHint": "Only letters, numbers, hyphens, and underscores.",
+      "cancelButton": "Cancel",
+      "createButton": "Create"
+    },
+    "deleteModal": {
+      "title": "Delete project",
+      "confirmMessage": "Are you sure you want to delete {name}? This will permanently remove all its environment variables.",
+      "cancelButton": "Cancel",
+      "deleteButton": "Delete"
+    },
+    "toast": {
+      "created": "Project \"{name}\" created",
+      "deleted": "Project deleted"
+    }
+  },
+  "project": {
+    "breadcrumb": "Projects",
+    "editButton": "Edit variables",
+    "environments": {
+      "development": "Development",
+      "staging": "Staging",
+      "production": "Production"
+    },
+    "editMode": {
+      "label": "Edit {env} variables",
+      "hint": "One KEY=VALUE per line. Lines starting with # are ignored.",
+      "encryptionNote": "Values are encrypted with AES-256-GCM before being stored.",
+      "cancelButton": "Cancel",
+      "saveButton": "Save to {env}",
+      "noVariablesError": "No valid KEY=VALUE pairs found"
+    },
+    "viewMode": {
+      "empty": {
+        "message": "No variables for {env}",
+        "description": "Click \"Edit variables\" to add them.",
+        "button": "Add variables"
+      },
+      "table": {
+        "keyHeader": "Key",
+        "valueHeader": "Value",
+        "reveal": "Reveal",
+        "hide": "Hide",
+        "copy": "Copy KEY=VALUE",
+        "copied": "Copied to clipboard"
+      },
+      "footer": {
+        "variableCount": "{count, plural, one {# variable} other {# variables}}",
+        "encryption": "All values are AES-256-GCM encrypted at rest"
+      }
+    },
+    "deleteProjectTitle": "Delete project",
+    "toast": {
+      "saved": "{env} variables saved"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "account": {
+      "sectionTitle": "Account",
+      "emailLabel": "Email",
+      "userIdLabel": "User ID"
+    },
+    "apiToken": {
+      "sectionTitle": "API Token",
+      "description": "Your token is stored locally in this browser. It was shown once at registration — if you've lost it, sign out and register a new account.",
+      "cliHint": "Use this token with the CLI:"
+    },
+    "dangerZone": {
+      "sectionTitle": "Danger zone",
+      "signOutTitle": "Sign out",
+      "signOutDescription": "Removes your token from this browser.",
+      "signOutButton": "Sign out"
+    }
+  }
+}

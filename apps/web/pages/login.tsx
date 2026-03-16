@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { register, verifyToken } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
@@ -15,6 +16,7 @@ const TOKEN_REGEX = /^[0-9a-f]{64}$/i;
 export default function LoginPage() {
   const { token, isReady, login } = useAuth();
   const router = useRouter();
+  const t = useTranslations('login');
 
   const [tab, setTab] = useState<Tab>('register');
   const [email, setEmail] = useState('');
@@ -38,7 +40,7 @@ export default function LoginPage() {
       setNewToken(data.apiToken);
       track('user_registered');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Registration failed');
+      toast.error(err instanceof Error ? err.message : t('errors.registrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -46,24 +48,24 @@ export default function LoginPage() {
 
   async function handleTokenLogin(e: React.FormEvent) {
     e.preventDefault();
-    const t = tokenInput.trim();
-    if (!t) return;
+    const value = tokenInput.trim();
+    if (!value) return;
 
     // Client-side format check before hitting the network
-    if (!TOKEN_REGEX.test(t)) {
-      setTokenError('Token must be a 64-character hex string.');
+    if (!TOKEN_REGEX.test(value)) {
+      setTokenError(t('tokenLogin.invalidFormat'));
       return;
     }
     setTokenError('');
     setLoading(true);
 
     try {
-      await verifyToken(t);
-      login(t);
+      await verifyToken(value);
+      login(value);
       track('user_logged_in');
       router.push('/dashboard');
     } catch {
-      toast.error('Invalid token. Check that you copied it correctly.');
+      toast.error(t('tokenLogin.invalidToken'));
     } finally {
       setLoading(false);
     }
@@ -90,30 +92,28 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Branding */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">EnvSync</h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Sync environment variables across your team
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">{t('title')}</h1>
+          <p className="mt-2 text-sm text-gray-500">{t('subtitle')}</p>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
           {/* Tabs */}
           <div className="mb-6 flex gap-1 rounded-lg bg-gray-100 p-1">
-            {(['register', 'token'] as const).map((t) => (
+            {(['register', 'token'] as const).map((tabKey) => (
               <button
-                key={t}
+                key={tabKey}
                 onClick={() => {
-                  setTab(t);
+                  setTab(tabKey);
                   setNewToken(null);
                   setTokenError('');
                 }}
                 className={`flex-1 rounded-md py-1.5 text-sm font-medium transition-colors
-                  ${tab === t
+                  ${tab === tabKey
                     ? 'bg-white text-gray-900 shadow-sm'
                     : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
-                {t === 'register' ? 'Create account' : 'Sign in with token'}
+                {tabKey === 'register' ? t('tabs.register') : t('tabs.token')}
               </button>
             ))}
           </div>
@@ -122,16 +122,16 @@ export default function LoginPage() {
           {tab === 'register' && !newToken && (
             <form onSubmit={handleRegister} className="space-y-4">
               <Input
-                label="Email address"
+                label={t('register.emailLabel')}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@company.com"
+                placeholder={t('register.emailPlaceholder')}
                 required
                 autoFocus
               />
               <Button type="submit" loading={loading} className="w-full">
-                Create account
+                {t('register.submitButton')}
               </Button>
             </form>
           )}
@@ -140,10 +140,8 @@ export default function LoginPage() {
           {tab === 'register' && newToken && (
             <div className="space-y-4">
               <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-                <p className="mb-1 text-sm font-semibold text-green-800">Account created!</p>
-                <p className="mb-3 text-xs text-green-700">
-                  Copy your API token now — it will not be shown again.
-                </p>
+                <p className="mb-1 text-sm font-semibold text-green-800">{t('register.success.title')}</p>
+                <p className="mb-3 text-xs text-green-700">{t('register.success.description')}</p>
                 <div className="flex items-start gap-2 rounded-md border border-green-200 bg-white p-2">
                   <span className="flex-1 select-all break-all font-mono text-xs text-gray-800">
                     {newToken}
@@ -152,12 +150,12 @@ export default function LoginPage() {
                     onClick={copyToken}
                     className="shrink-0 rounded px-2 py-0.5 text-xs font-medium text-green-700 hover:bg-green-100 transition-colors"
                   >
-                    {copied ? 'Copied!' : 'Copy'}
+                    {copied ? t('register.success.copiedButton') : t('register.success.copyButton')}
                   </button>
                 </div>
               </div>
               <Button onClick={handleContinueWithToken} className="w-full">
-                Continue to dashboard
+                {t('register.success.continueButton')}
               </Button>
             </div>
           )}
@@ -166,28 +164,28 @@ export default function LoginPage() {
           {tab === 'token' && (
             <form onSubmit={handleTokenLogin} className="space-y-4">
               <Input
-                label="API token"
+                label={t('tokenLogin.label')}
                 type="password"
                 value={tokenInput}
                 onChange={(e) => {
                   setTokenInput(e.target.value);
                   if (tokenError) setTokenError('');
                 }}
-                placeholder="Paste your 64-character token"
+                placeholder={t('tokenLogin.placeholder')}
                 required
                 autoFocus
-                hint="You received this when you first registered."
+                hint={t('tokenLogin.hint')}
                 error={tokenError}
               />
               <Button type="submit" loading={loading} className="w-full">
-                Sign in
+                {t('tokenLogin.submitButton')}
               </Button>
             </form>
           )}
         </div>
 
         <p className="mt-6 text-center text-xs text-gray-400">
-          Using the CLI?{' '}
+          {t('cliHint')}{' '}
           <code className="rounded bg-gray-100 px-1 py-0.5 font-mono">
             envsync login --token &lt;token&gt;
           </code>
