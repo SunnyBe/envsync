@@ -27,6 +27,19 @@ export async function createProject(input: CreateProjectInput): Promise<ProjectO
   return { id: project.id, name: project.name, createdAt: project.createdAt };
 }
 
+export async function deleteProject(projectId: string, ownerId: string): Promise<void> {
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+
+  if (!project || !project.isActive || project.ownerId !== ownerId) {
+    const err: any = new Error('Project not found');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  await prisma.project.update({ where: { id: projectId }, data: { isActive: false } });
+  logger.info({ audit: true, action: 'project.delete', projectId, ownerId }, 'audit');
+}
+
 export async function listProjects(ownerId: string): Promise<ProjectOutput[]> {
   const projects = await prisma.project.findMany({
     where: { ownerId, isActive: true },

@@ -58,6 +58,9 @@ export const getProjects = () =>
 export const createProject = (name: string) =>
   apiClient.post<{ id: string; name: string }>('/projects', { name }).then((r) => r.data);
 
+export const deleteProject = (id: string) =>
+  apiClient.delete(`/projects/${id}`);
+
 // ── Env Vars ─────────────────────────────────────────────────────────────────
 
 export const getEnvVars = (projectId: string, env: Environment) =>
