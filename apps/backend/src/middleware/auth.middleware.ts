@@ -4,7 +4,7 @@ import prisma from '../infrastructure/prisma/client';
 import logger from '../infrastructure/logger';
 
 export interface AuthRequest extends Request {
-  user?: { id: string; email: string; apiToken: string };
+  user?: { id: string; email: string; apiToken: string; isActive: boolean };
 }
 
 export async function authMiddleware(
@@ -14,7 +14,10 @@ export async function authMiddleware(
 ): Promise<void> {
   const header = req.headers['authorization'];
   if (!header?.startsWith('Bearer ')) {
-    logger.warn({ requestId: (req as any).id }, 'Auth failed: missing or invalid Authorization header');
+    logger.warn(
+      { requestId: (req as any).id },
+      'Auth failed: missing or invalid Authorization header',
+    );
     res.status(401).json({ error: 'Missing or invalid Authorization header' });
     return;
   }
@@ -24,6 +27,14 @@ export async function authMiddleware(
   if (!user) {
     logger.warn({ requestId: (req as any).id }, 'Auth failed: invalid token');
     res.status(401).json({ error: 'Invalid token' });
+    return;
+  }
+  if (!user.isActive) {
+    logger.warn(
+      { requestId: (req as any).id, userId: user.id },
+      'Auth failed: account deactivated',
+    );
+    res.status(401).json({ error: 'Account deactivated' });
     return;
   }
   req.user = user;

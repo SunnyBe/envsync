@@ -19,7 +19,7 @@ apiClient.interceptors.response.use(
   (err: AxiosError<{ error: string }>) => {
     const message = err.response?.data?.error ?? err.message ?? 'Unexpected error';
     return Promise.reject(new Error(message));
-  }
+  },
 );
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -58,8 +58,7 @@ export const getProjects = () =>
 export const createProject = (name: string) =>
   apiClient.post<{ id: string; name: string }>('/projects', { name }).then((r) => r.data);
 
-export const deleteProject = (id: string) =>
-  apiClient.delete(`/projects/${id}`);
+export const deleteProject = (id: string) => apiClient.delete(`/projects/${id}`);
 
 // ── Env Vars ─────────────────────────────────────────────────────────────────
 
@@ -71,11 +70,17 @@ export const getEnvVars = (projectId: string, env: Environment) =>
 export const pushEnvVars = (
   projectId: string,
   env: Environment,
-  variables: Record<string, string>
+  variables: Record<string, string>,
 ) =>
   apiClient
     .post<{ ok: boolean }>(`/projects/${projectId}/env`, { variables }, { params: { env } })
     .then((r) => r.data);
+
+export const deleteEnvVar = (projectId: string, env: Environment, key: string) =>
+  apiClient.delete(`/projects/${projectId}/env/${encodeURIComponent(key)}`, { params: { env } });
+
+export const renameProject = (id: string, name: string) =>
+  apiClient.patch<{ id: string; name: string }>(`/projects/${id}`, { name }).then((r) => r.data);
 
 // ── Auth extras ───────────────────────────────────────────────────────────────
 

@@ -8,6 +8,8 @@ import { useAuth } from '@/context/AuthContext';
 import {
   getEnvVars,
   pushEnvVars,
+  deleteEnvVar,
+  renameProject,
   getMembers,
   inviteMember,
   removeMember,
@@ -38,7 +40,8 @@ export default function ProjectPage() {
   const tMembers = useTranslations('members');
 
   const projectId = router.query.id as string;
-  const projectName = (router.query.name as string) ?? projectId;
+  const [displayName, setDisplayName] = useState((router.query.name as string) ?? '');
+  const projectName = (displayName || (router.query.name as string)) ?? projectId;
 
   const [tab, setTab] = useState<Tab>('variables');
   const [env, setEnv] = useState<Environment>('development');
@@ -46,6 +49,10 @@ export default function ProjectPage() {
   const [draftText, setDraftText] = useState('');
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [search, setSearch] = useState('');
+
+  // Rename state
+  const [renaming, setRenaming] = useState(false);
+  const [renameValue, setRenameValue] = useState('');
 
   // Members state
   const [inviteEmail, setInviteEmail] = useState('');
@@ -106,6 +113,26 @@ export default function ProjectPage() {
     onSuccess: () => {
       toast.success(tMembers('toast.removed'));
       qc.invalidateQueries({ queryKey: ['members', projectId] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const deleteVarMutation = useMutation({
+    mutationFn: (key: string) => deleteEnvVar(projectId, env, key),
+    onSuccess: (_data, key) => {
+      qc.invalidateQueries({ queryKey: ['envVars', projectId, env] });
+      toast.success(t('toast.deleted', { key }));
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const renameMutation = useMutation({
+    mutationFn: (name: string) => renameProject(projectId, name),
+    onSuccess: (data) => {
+      setDisplayName(data.name);
+      setRenaming(false);
+      toast.success(t('toast.renamed', { name: data.name }));
+      qc.invalidateQueries({ queryKey: ['projects'] });
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -184,10 +211,61 @@ export default function ProjectPage() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{projectName}</h1>
+            {renaming ? (
+              <div className="flex items-center gap-2">
+                <input
+                  autoFocus
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && renameValue.trim())
+                      renameMutation.mutate(renameValue.trim());
+                    if (e.key === 'Escape') setRenaming(false);
+                  }}
+                  className="rounded-lg border border-indigo-300 px-3 py-1.5 text-xl font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                />
+                <Button
+                  size="sm"
+                  onClick={() => renameMutation.mutate(renameValue.trim())}
+                  loading={renameMutation.isPending}
+                  disabled={!renameValue.trim()}
+                >
+                  {t('renameSave')}
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => setRenaming(false)}>
+                  {t('renameCancel')}
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 group">
+                <h1 className="text-2xl font-bold text-gray-900">{projectName}</h1>
+                <button
+                  onClick={() => {
+                    setRenameValue(projectName);
+                    setRenaming(true);
+                  }}
+                  className="rounded p-1 text-gray-300 opacity-0 group-hover:opacity-100 hover:text-gray-600 transition-opacity"
+                  title={t('renameButton')}
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
             <p className="mt-1 text-xs font-mono text-gray-400">{projectId}</p>
           </div>
-          {tab === 'variables' && !editMode && (
+          {tab === 'variables' && !editMode && !renaming && (
             <Button onClick={enterEditMode}>
               <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
@@ -437,6 +515,26 @@ export default function ProjectPage() {
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
                                       d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                                    />
+                                  </svg>
+                                </button>
+                                <button
+                                  onClick={() => deleteVarMutation.mutate(key)}
+                                  disabled={deleteVarMutation.isPending}
+                                  className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-500"
+                                  title={t('viewMode.table.delete')}
+                                >
+                                  <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={1.5}
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
                                     />
                                   </svg>
                                 </button>

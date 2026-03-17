@@ -97,7 +97,8 @@
         "reveal": "Mostrar",
         "hide": "Ocultar",
         "copy": "Copiar CLAVE=VALOR",
-        "copied": "Copiado al portapapeles"
+        "copied": "Copiado al portapapeles",
+        "delete": "Eliminar variable"
       },
       "footer": {
         "variableCount": "{count, plural, one {# variable} other {# variables}}",
@@ -106,8 +107,13 @@
     },
     "exportButton": "Exportar .env",
     "deleteProjectTitle": "Eliminar proyecto",
+    "renameButton": "Renombrar proyecto",
+    "renameSave": "Guardar",
+    "renameCancel": "Cancelar",
     "toast": {
-      "saved": "Variables de {env} guardadas"
+      "saved": "Variables de {env} guardadas",
+      "deleted": "Variable «{key}» eliminada",
+      "renamed": "Proyecto renombrado a «{name}»"
     }
   },
   "settings": {
@@ -170,6 +176,8 @@
     "actions": {
       "project.create": "Proyecto creado",
       "project.delete": "Proyecto eliminado",
+      "project.rename": "Proyecto renombrado",
+      "env.delete": "Variable eliminada",
       "env.push": "Variables sincronizadas",
       "env.pull": "Variables obtenidas",
       "auth.regenerate_token": "Token API regenerado",

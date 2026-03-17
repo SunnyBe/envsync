@@ -50,6 +50,41 @@ export async function deleteProject(projectId: string, ownerId: string): Promise
   });
 }
 
+export async function renameProject(
+  projectId: string,
+  ownerId: string,
+  newName: string,
+): Promise<ProjectOutput> {
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+
+  if (!project || !project.isActive || project.ownerId !== ownerId) {
+    throw new AppError('Project not found', 404);
+  }
+
+  const conflict = await prisma.project.findUnique({
+    where: { name_ownerId: { name: newName, ownerId } },
+  });
+
+  if (conflict) {
+    throw new AppError('Project with this name already exists', 409);
+  }
+
+  const updated = await prisma.project.update({
+    where: { id: projectId },
+    data: { name: newName },
+  });
+
+  await recordAudit({
+    userId: ownerId,
+    action: 'project.rename',
+    resourceType: 'project',
+    resourceId: projectId,
+    metadata: { oldName: project.name, newName },
+  });
+
+  return { id: updated.id, name: updated.name, createdAt: updated.createdAt };
+}
+
 export async function listProjects(ownerId: string): Promise<ProjectOutput[]> {
   const projects = await prisma.project.findMany({
     where: { ownerId, isActive: true },

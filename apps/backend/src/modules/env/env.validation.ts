@@ -20,3 +20,11 @@ export const pullEnvSchema = z.object({
   }),
   projectId: z.string().uuid('projectId must be a valid UUID'),
 });
+
+export const deleteEnvSchema = z.object({
+  env: z.enum(SUPPORTED_ENVIRONMENTS, {
+    error: 'env must be one of: development, staging, production',
+  }),
+  projectId: z.string().uuid('projectId must be a valid UUID'),
+  key: z.string().min(1, 'key is required'),
+});

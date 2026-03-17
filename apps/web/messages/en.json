@@ -97,7 +97,8 @@
         "reveal": "Reveal",
         "hide": "Hide",
         "copy": "Copy KEY=VALUE",
-        "copied": "Copied to clipboard"
+        "copied": "Copied to clipboard",
+        "delete": "Delete variable"
       },
       "footer": {
         "variableCount": "{count, plural, one {# variable} other {# variables}}",
@@ -106,8 +107,13 @@
     },
     "exportButton": "Export .env",
     "deleteProjectTitle": "Delete project",
+    "renameButton": "Rename project",
+    "renameSave": "Save",
+    "renameCancel": "Cancel",
     "toast": {
-      "saved": "{env} variables saved"
+      "saved": "{env} variables saved",
+      "deleted": "Variable \"{key}\" deleted",
+      "renamed": "Project renamed to \"{name}\""
     }
   },
   "settings": {
@@ -170,6 +176,8 @@
     "actions": {
       "project.create": "Created project",
       "project.delete": "Deleted project",
+      "project.rename": "Renamed project",
+      "env.delete": "Deleted variable",
       "env.push": "Pushed variables",
       "env.pull": "Pulled variables",
       "auth.regenerate_token": "Regenerated API token",

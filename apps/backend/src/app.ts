@@ -45,7 +45,7 @@ app.use(metricsMiddleware);
 // Falls back to reflecting any origin (true) when the var is not set — safe for local dev only.
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim());
 app.use(cors({ origin: allowedOrigins ?? true, credentials: true }));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 
 app.use(generalLimiter);
 

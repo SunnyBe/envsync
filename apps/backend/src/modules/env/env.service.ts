@@ -81,3 +81,35 @@ export async function pullVariables(
 
   return { variables };
 }
+
+export async function deleteVariable(input: {
+  projectId: string;
+  env: string;
+  key: string;
+  requesterId: string;
+}): Promise<void> {
+  const { projectId, env, key, requesterId } = input;
+
+  await checkProjectAccess(projectId, requesterId, 'EDITOR');
+
+  const record = await prisma.envVariable.findUnique({
+    where: { projectId_key_env: { projectId, key, env } } as any,
+  });
+
+  if (!record || !record.isActive) {
+    throw new AppError('Variable not found', 404);
+  }
+
+  await prisma.envVariable.update({
+    where: { projectId_key_env: { projectId, key, env } } as any,
+    data: { isActive: false },
+  });
+
+  await recordAudit({
+    userId: requesterId,
+    action: 'env.delete',
+    resourceType: 'project',
+    resourceId: projectId,
+    metadata: { env, key },
+  });
+}
