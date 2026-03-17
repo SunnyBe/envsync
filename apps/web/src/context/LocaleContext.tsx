@@ -14,23 +14,58 @@ export const LOCALES: { value: Locale; label: string; flag: string }[] = [
 // Maps country codes returned by IP geolocation → supported locale
 const COUNTRY_LOCALE: Record<string, Locale> = {
   // English-speaking countries
-  US: 'en', GB: 'en', AU: 'en', CA: 'en', NZ: 'en', IE: 'en', ZA: 'en',
+  US: 'en',
+  GB: 'en',
+  AU: 'en',
+  CA: 'en',
+  NZ: 'en',
+  IE: 'en',
+  ZA: 'en',
   // French-speaking countries
-  FR: 'fr', BE: 'fr', CH: 'fr', LU: 'fr', MC: 'fr', SN: 'fr', CI: 'fr',
+  FR: 'fr',
+  BE: 'fr',
+  CH: 'fr',
+  LU: 'fr',
+  MC: 'fr',
+  SN: 'fr',
+  CI: 'fr',
   // Spanish-speaking countries
-  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es', VE: 'es',
-  BO: 'es', PY: 'es', UY: 'es', EC: 'es', GT: 'es', HN: 'es', SV: 'es',
-  NI: 'es', CR: 'es', PA: 'es', DO: 'es', CU: 'es',
+  ES: 'es',
+  MX: 'es',
+  AR: 'es',
+  CO: 'es',
+  CL: 'es',
+  PE: 'es',
+  VE: 'es',
+  BO: 'es',
+  PY: 'es',
+  UY: 'es',
+  EC: 'es',
+  GT: 'es',
+  HN: 'es',
+  SV: 'es',
+  NI: 'es',
+  CR: 'es',
+  PA: 'es',
+  DO: 'es',
+  CU: 'es',
 };
 
 const STORAGE_KEY = 'envsync_locale';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const MESSAGES: Record<Locale, any> = {
+export const MESSAGES: Record<Locale, typeof enMessages> = {
   en: enMessages,
   fr: frMessages,
   es: esMessages,
 };
+
+// Read saved locale from localStorage during first render (client only)
+function getInitialLocale(): Locale {
+  if (typeof window === 'undefined') return 'en';
+  const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
+  if (saved && MESSAGES[saved]) return saved;
+  return 'en';
+}
 
 interface LocaleContextValue {
   locale: Locale;
@@ -57,17 +92,14 @@ function fromBrowserLang(lang: string): Locale {
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en');
+  // Lazy initializer reads localStorage synchronously on first render (client only)
+  const [locale, setLocaleState] = useState<Locale>(getInitialLocale);
 
   useEffect(() => {
-    // 1. Saved user preference wins immediately — no network call needed
-    const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
-    if (saved && MESSAGES[saved]) {
-      setLocaleState(saved);
-      return;
-    }
+    // If a preference is already saved, nothing to detect
+    if (localStorage.getItem(STORAGE_KEY)) return;
 
-    // 2. Try IP geolocation — async, non-blocking
+    // Try IP geolocation — async, non-blocking
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000); // 3s timeout
 

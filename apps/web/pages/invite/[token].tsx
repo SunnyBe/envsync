@@ -1,24 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { apiClient } from '@/lib/api';
 
+type Status = 'idle' | 'success' | 'error';
+
 export default function AcceptInvitePage() {
   const { token, isReady } = useAuth();
   const router = useRouter();
   const inviteToken = router.query.token as string;
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  // Ref prevents double-firing in React Strict Mode without adding mutation to deps
+  const accepted = useRef(false);
 
-  const acceptMutation = useMutation({
-    mutationFn: () =>
-      apiClient.post(`/auth/invites/${inviteToken}/accept`).then((r) => r.data),
+  const acceptMutation = useMutation<unknown, Error>({
+    mutationFn: () => apiClient.post(`/auth/invites/${inviteToken}/accept`).then((r) => r.data),
     onSuccess: () => {
-      setStatus('success');
       setTimeout(() => router.push('/dashboard'), 2000);
     },
-    onError: () => setStatus('error'),
   });
+
+  const status: Status = acceptMutation.isSuccess
+    ? 'success'
+    : acceptMutation.isError
+      ? 'error'
+      : 'idle';
 
   useEffect(() => {
     if (isReady && !token) {
@@ -27,10 +33,11 @@ export default function AcceptInvitePage() {
   }, [isReady, token, router, inviteToken]);
 
   useEffect(() => {
-    if (isReady && token && inviteToken && status === 'idle') {
+    if (isReady && token && inviteToken && !accepted.current) {
+      accepted.current = true;
       acceptMutation.mutate();
     }
-  }, [isReady, token, inviteToken]);
+  }, [isReady, token, inviteToken, acceptMutation]);
 
   if (!isReady) return null;
 
@@ -48,25 +55,41 @@ export default function AcceptInvitePage() {
           <>
             <div className="mb-4 flex justify-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg
+                  className="h-6 w-6 text-green-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </div>
             </div>
-            <h2 className="mb-1 text-lg font-semibold text-gray-900">You're in!</h2>
-            <p className="text-sm text-gray-500">Invitation accepted. Redirecting to dashboard...</p>
+            <h2 className="mb-1 text-lg font-semibold text-gray-900">{"You're in!"}</h2>
+            <p className="text-sm text-gray-500">
+              Invitation accepted. Redirecting to dashboard...
+            </p>
           </>
         ) : (
           <>
             <div className="mb-4 flex justify-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-                <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg
+                  className="h-6 w-6 text-red-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
             </div>
             <h2 className="mb-1 text-lg font-semibold text-gray-900">Invalid invitation</h2>
-            <p className="mb-4 text-sm text-gray-500">This invite link is invalid or has already been used.</p>
+            <p className="mb-4 text-sm text-gray-500">
+              This invite link is invalid or has already been used.
+            </p>
             <button
               onClick={() => router.push('/dashboard')}
               className="text-sm font-medium text-indigo-600 hover:text-indigo-700"

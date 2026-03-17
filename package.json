@@ -8,6 +8,29 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "dev:backend": "npm run dev --workspace=apps/backend",
-    "dev:web": "npm run dev --workspace=apps/web"
+    "dev:web": "npm run dev --workspace=apps/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "type-check": "tsc --noEmit -p apps/backend/tsconfig.json && tsc --noEmit -p apps/web/tsconfig.json",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  },
+  "lint-staged": {
+    "apps/backend/src/**/*.ts": [
+      "eslint --fix --config apps/backend/eslint.config.mjs",
+      "prettier --write"
+    ],
+    "apps/web/**/*.{ts,tsx}": [
+      "eslint --fix --config apps/web/eslint.config.mjs",
+      "prettier --write"
+    ],
+    "apps/cli/src/**/*.ts": [
+      "prettier --write"
+    ],
+    "**/*.{json,yml,yaml,md}": [
+      "prettier --write"
+    ]
   }
 }

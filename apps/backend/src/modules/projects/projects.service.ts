@@ -2,6 +2,7 @@ import prisma from '../../infrastructure/prisma/client';
 import logger from '../../infrastructure/logger';
 import { recordAudit } from '../audit/audit.service';
 import { CreateProjectInput, ProjectOutput } from './projects.types';
+import { AppError } from '../../infrastructure/errors';
 
 export async function createProject(input: CreateProjectInput): Promise<ProjectOutput> {
   const { name, ownerId } = input;
@@ -11,16 +12,12 @@ export async function createProject(input: CreateProjectInput): Promise<ProjectO
 
   if (existing && !existing.isActive) {
     logger.warn({ name, ownerId }, 'Project creation failed: project was deactivated');
-    const err: any = new Error('A project with this name was previously deactivated');
-    err.statusCode = 409;
-    throw err;
+    throw new AppError('A project with this name was previously deactivated', 409);
   }
 
   if (existing) {
     logger.warn({ name, ownerId }, 'Project creation failed: project already exists');
-    const err: any = new Error('Project with this name already exists');
-    err.statusCode = 409;
-    throw err;
+    throw new AppError('Project with this name already exists', 409);
   }
 
   const project = await prisma.project.create({ data: { name, ownerId } });
@@ -40,9 +37,7 @@ export async function deleteProject(projectId: string, ownerId: string): Promise
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
   if (!project || !project.isActive || project.ownerId !== ownerId) {
-    const err: any = new Error('Project not found');
-    err.statusCode = 404;
-    throw err;
+    throw new AppError('Project not found', 404);
   }
 
   await prisma.project.update({ where: { id: projectId }, data: { isActive: false } });
@@ -60,5 +55,11 @@ export async function listProjects(ownerId: string): Promise<ProjectOutput[]> {
     where: { ownerId, isActive: true },
     orderBy: { createdAt: 'desc' },
   });
-  return projects.map((p: { id: string; name: string; createdAt: Date }): ProjectOutput => ({ id: p.id, name: p.name, createdAt: p.createdAt }));
+  return projects.map(
+    (p: { id: string; name: string; createdAt: Date }): ProjectOutput => ({
+      id: p.id,
+      name: p.name,
+      createdAt: p.createdAt,
+    }),
+  );
 }

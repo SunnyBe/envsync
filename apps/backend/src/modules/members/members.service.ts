@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import prisma from '../../infrastructure/prisma/client';
 import logger from '../../infrastructure/logger';
 import { recordAudit } from '../audit/audit.service';
+import { AppError } from '../../infrastructure/errors';
 
 export async function inviteMember(
   projectId: string,
@@ -13,15 +14,11 @@ export async function inviteMember(
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
   if (!project || !project.isActive) {
-    const err: any = new Error('Project not found');
-    err.statusCode = 404;
-    throw err;
+    throw new AppError('Project not found', 404);
   }
 
   if (project.ownerId !== ownerId) {
-    const err: any = new Error('Only the project owner can invite members');
-    err.statusCode = 403;
-    throw err;
+    throw new AppError('Only the project owner can invite members', 403);
   }
 
   // Check if already a member
@@ -29,9 +26,7 @@ export async function inviteMember(
     where: { projectId_email: { projectId, email } },
   });
   if (existing) {
-    const err: any = new Error('This email is already invited to the project');
-    err.statusCode = 409;
-    throw err;
+    throw new AppError('This email is already invited to the project', 409);
   }
 
   const inviteToken = crypto.randomBytes(16).toString('hex');
@@ -60,15 +55,11 @@ export async function acceptInvite(
   const member = await prisma.projectMember.findUnique({ where: { inviteToken } });
 
   if (!member || member.acceptedAt) {
-    const err: any = new Error('Invite not found or already accepted');
-    err.statusCode = 404;
-    throw err;
+    throw new AppError('Invite not found or already accepted', 404);
   }
 
   if (member.email !== userEmail) {
-    const err: any = new Error('This invite is for a different email address');
-    err.statusCode = 403;
-    throw err;
+    throw new AppError('This invite is for a different email address', 403);
   }
 
   await prisma.projectMember.update({
@@ -88,9 +79,7 @@ export async function listMembers(projectId: string, requesterId: string) {
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
   if (!project || !project.isActive) {
-    const err: any = new Error('Project not found');
-    err.statusCode = 404;
-    throw err;
+    throw new AppError('Project not found', 404);
   }
 
   // Must be owner or accepted member
@@ -99,9 +88,7 @@ export async function listMembers(projectId: string, requesterId: string) {
       where: { projectId, userId: requesterId, acceptedAt: { not: null } },
     });
     if (!membership) {
-      const err: any = new Error('Access denied');
-      err.statusCode = 403;
-      throw err;
+      throw new AppError('Access denied', 403);
     }
   }
 
@@ -129,16 +116,12 @@ export async function removeMember(
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
   if (!project || project.ownerId !== ownerId) {
-    const err: any = new Error('Project not found');
-    err.statusCode = 404;
-    throw err;
+    throw new AppError('Project not found', 404);
   }
 
   const member = await prisma.projectMember.findUnique({ where: { id: memberId } });
   if (!member || member.projectId !== projectId) {
-    const err: any = new Error('Member not found');
-    err.statusCode = 404;
-    throw err;
+    throw new AppError('Member not found', 404);
   }
 
   await prisma.projectMember.delete({ where: { id: memberId } });

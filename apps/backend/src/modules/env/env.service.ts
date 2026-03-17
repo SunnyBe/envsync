@@ -1,8 +1,8 @@
 import prisma from '../../infrastructure/prisma/client';
 import { encrypt, decrypt } from '../../services/encryption/encryption.service';
 import { PushEnvInput, PullEnvInput, PullEnvOutput } from './env.types';
-import logger from '../../infrastructure/logger';
 import { recordAudit } from '../audit/audit.service';
+import { AppError } from '../../infrastructure/errors';
 
 async function checkProjectAccess(
   projectId: string,
@@ -12,9 +12,7 @@ async function checkProjectAccess(
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
   if (!project || !project.isActive) {
-    const err: any = new Error('Project not found');
-    err.statusCode = 404;
-    throw err;
+    throw new AppError('Project not found', 404);
   }
 
   // Owner always has full access
@@ -26,16 +24,12 @@ async function checkProjectAccess(
   });
 
   if (!member) {
-    const err: any = new Error('Access denied');
-    err.statusCode = 403;
-    throw err;
+    throw new AppError('Access denied', 403);
   }
 
   // Viewer cannot push
   if (requiredRole === 'EDITOR' && member.role === 'VIEWER') {
-    const err: any = new Error('You have viewer access — editing is not allowed');
-    err.statusCode = 403;
-    throw err;
+    throw new AppError('You have viewer access — editing is not allowed', 403);
   }
 }
 
@@ -62,7 +56,9 @@ export async function pushVariables(input: PushEnvInput & { requesterId: string 
   });
 }
 
-export async function pullVariables(input: PullEnvInput & { requesterId: string }): Promise<PullEnvOutput> {
+export async function pullVariables(
+  input: PullEnvInput & { requesterId: string },
+): Promise<PullEnvOutput> {
   const { projectId, env, requesterId } = input;
 
   await checkProjectAccess(projectId, requesterId, 'VIEWER');

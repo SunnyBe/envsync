@@ -3,6 +3,7 @@ import prisma from '../../infrastructure/prisma/client';
 import logger from '../../infrastructure/logger';
 import { recordAudit } from '../audit/audit.service';
 import { RegisterInput, RegisterOutput } from './auth.types';
+import { AppError } from '../../infrastructure/errors';
 
 export async function registerUser(input: RegisterInput): Promise<RegisterOutput> {
   const { email } = input;
@@ -11,16 +12,12 @@ export async function registerUser(input: RegisterInput): Promise<RegisterOutput
 
   if (existing && !existing.isActive) {
     logger.warn({ email }, 'Registration failed: account is deactivated');
-    const err: any = new Error('This account has been deactivated');
-    err.statusCode = 403;
-    throw err;
+    throw new AppError('This account has been deactivated', 403);
   }
 
   if (existing) {
     logger.warn({ email }, 'Registration failed: email already registered');
-    const err: any = new Error('Email already registered');
-    err.statusCode = 409;
-    throw err;
+    throw new AppError('Email already registered', 409);
   }
 
   const apiToken = crypto.randomBytes(32).toString('hex');
