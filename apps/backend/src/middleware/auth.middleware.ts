@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../infrastructure/prisma/client';
 import logger from '../infrastructure/logger';
@@ -18,7 +19,8 @@ export async function authMiddleware(
     return;
   }
   const token = header.slice(7);
-  const user = await prisma.user.findUnique({ where: { apiToken: token } });
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  const user = await prisma.user.findUnique({ where: { apiToken: tokenHash } });
   if (!user) {
     logger.warn({ requestId: (req as any).id }, 'Auth failed: invalid token');
     res.status(401).json({ error: 'Invalid token' });

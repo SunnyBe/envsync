@@ -24,16 +24,20 @@ export async function registerUser(input: RegisterInput): Promise<RegisterOutput
   }
 
   const apiToken = crypto.randomBytes(32).toString('hex');
-  const user = await prisma.user.create({ data: { email, apiToken } });
+  const tokenHash = crypto.createHash('sha256').update(apiToken).digest('hex');
+  const user = await prisma.user.create({ data: { email, apiToken: tokenHash } });
 
   await recordAudit({ userId: user.id, action: 'auth.register', metadata: { email: user.email } });
 
-  return { id: user.id, email: user.email, apiToken: user.apiToken };
+  // Return plaintext token once — only the SHA-256 hash is persisted in the DB
+  return { id: user.id, email: user.email, apiToken };
 }
 
 export async function regenerateToken(userId: string): Promise<{ apiToken: string }> {
   const apiToken = crypto.randomBytes(32).toString('hex');
-  await prisma.user.update({ where: { id: userId }, data: { apiToken } });
+  const tokenHash = crypto.createHash('sha256').update(apiToken).digest('hex');
+  await prisma.user.update({ where: { id: userId }, data: { apiToken: tokenHash } });
   await recordAudit({ userId, action: 'auth.regenerate_token' });
+  // Return plaintext token once — only the SHA-256 hash is persisted in the DB
   return { apiToken };
 }
