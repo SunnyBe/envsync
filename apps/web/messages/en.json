@@ -69,6 +69,7 @@
   },
   "project": {
     "breadcrumb": "Projects",
+    "variablesTab": "Variables",
     "editButton": "Edit variables",
     "environments": {
       "development": "Development",
@@ -199,5 +200,13 @@
       "invited": "Invite link generated for {email}",
       "removed": "Member removed"
     }
+  },
+  "invite": {
+    "accepting": "Accepting invitation...",
+    "successTitle": "You're in!",
+    "successDescription": "Invitation accepted. Redirecting to dashboard...",
+    "errorTitle": "Invalid invitation",
+    "errorDescription": "This invite link is invalid or has already been used.",
+    "goToDashboard": "Go to dashboard"
   }
 }

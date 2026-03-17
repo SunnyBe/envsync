@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useMutation } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { apiClient } from '@/lib/api';
 
@@ -9,6 +10,7 @@ type Status = 'idle' | 'success' | 'error';
 export default function AcceptInvitePage() {
   const { token, isReady } = useAuth();
   const router = useRouter();
+  const t = useTranslations('invite');
   const inviteToken = router.query.token as string;
   // Ref prevents double-firing in React Strict Mode without adding mutation to deps
   const accepted = useRef(false);
@@ -49,7 +51,7 @@ export default function AcceptInvitePage() {
             <div className="mb-4 flex justify-center">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
             </div>
-            <p className="text-sm text-gray-500">Accepting invitation...</p>
+            <p className="text-sm text-gray-500">{t('accepting')}</p>
           </>
         ) : status === 'success' ? (
           <>
@@ -66,10 +68,8 @@ export default function AcceptInvitePage() {
                 </svg>
               </div>
             </div>
-            <h2 className="mb-1 text-lg font-semibold text-gray-900">{"You're in!"}</h2>
-            <p className="text-sm text-gray-500">
-              Invitation accepted. Redirecting to dashboard...
-            </p>
+            <h2 className="mb-1 text-lg font-semibold text-gray-900">{t('successTitle')}</h2>
+            <p className="text-sm text-gray-500">{t('successDescription')}</p>
           </>
         ) : (
           <>
@@ -86,15 +86,13 @@ export default function AcceptInvitePage() {
                 </svg>
               </div>
             </div>
-            <h2 className="mb-1 text-lg font-semibold text-gray-900">Invalid invitation</h2>
-            <p className="mb-4 text-sm text-gray-500">
-              This invite link is invalid or has already been used.
-            </p>
+            <h2 className="mb-1 text-lg font-semibold text-gray-900">{t('errorTitle')}</h2>
+            <p className="mb-4 text-sm text-gray-500">{t('errorDescription')}</p>
             <button
               onClick={() => router.push('/dashboard')}
               className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
             >
-              Go to dashboard
+              {t('goToDashboard')}
             </button>
           </>
         )}

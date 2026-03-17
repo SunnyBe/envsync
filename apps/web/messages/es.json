@@ -69,6 +69,7 @@
   },
   "project": {
     "breadcrumb": "Proyectos",
+    "variablesTab": "Variables",
     "editButton": "Editar variables",
     "environments": {
       "development": "Desarrollo",
@@ -199,5 +200,13 @@
       "invited": "Enlace de invitación generado para {email}",
       "removed": "Miembro eliminado"
     }
+  },
+  "invite": {
+    "accepting": "Aceptando invitación...",
+    "successTitle": "¡Ya estás dentro!",
+    "successDescription": "Invitación aceptada. Redirigiendo al panel...",
+    "errorTitle": "Invitación inválida",
+    "errorDescription": "Este enlace de invitación es inválido o ya fue utilizado.",
+    "goToDashboard": "Ir al panel"
   }
 }
