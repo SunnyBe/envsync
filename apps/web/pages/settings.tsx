@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
+import { useLocale, LOCALES } from '@/context/LocaleContext';
 import { verifyToken } from '@/lib/api';
 import { Layout } from '@/components/Layout';
 import { Spinner } from '@/components/ui/Spinner';
@@ -11,6 +12,7 @@ export default function SettingsPage() {
   const { token, isReady, logout } = useAuth();
   const router = useRouter();
   const t = useTranslations('settings');
+  const { locale, setLocale } = useLocale();
 
   useEffect(() => {
     if (isReady && !token) router.replace('/login');
@@ -63,6 +65,28 @@ export default function SettingsPage() {
                 {t('apiToken.cliHint')}{' '}
                 <code className="rounded bg-gray-100 px-1 py-0.5">envsync login --token &lt;token&gt;</code>
               </p>
+            </section>
+
+            {/* Language */}
+            <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">{t('language.sectionTitle')}</h2>
+              <p className="mb-3 text-xs text-gray-400">{t('language.label')}</p>
+              <div className="flex gap-2">
+                {LOCALES.map(({ value, label, flag }) => (
+                  <button
+                    key={value}
+                    onClick={() => setLocale(value)}
+                    className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors
+                      ${locale === value
+                        ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                  >
+                    <span>{flag}</span>
+                    {label}
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Danger zone */}

@@ -83,6 +83,7 @@
       "noVariablesError": "No valid KEY=VALUE pairs found"
     },
     "viewMode": {
+      "searchPlaceholder": "Search variables...",
       "empty": {
         "message": "No variables for {env}",
         "description": "Click \"Edit variables\" to add them.",
@@ -101,6 +102,7 @@
         "encryption": "All values are AES-256-GCM encrypted at rest"
       }
     },
+    "exportButton": "Export .env",
     "deleteProjectTitle": "Delete project",
     "toast": {
       "saved": "{env} variables saved"
@@ -117,6 +119,10 @@
       "sectionTitle": "API Token",
       "description": "Your token is stored locally in this browser. It was shown once at registration — if you've lost it, sign out and register a new account.",
       "cliHint": "Use this token with the CLI:"
+    },
+    "language": {
+      "sectionTitle": "Language",
+      "label": "Display language"
     },
     "dangerZone": {
       "sectionTitle": "Danger zone",

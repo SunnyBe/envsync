@@ -1,0 +1,134 @@
+{
+  "layout": {
+    "nav": {
+      "projects": "Projets",
+      "settings": "Paramètres"
+    },
+    "signOut": "Se déconnecter"
+  },
+  "login": {
+    "title": "EnvSync",
+    "subtitle": "Synchronisez vos variables d'environnement en équipe",
+    "tabs": {
+      "register": "Créer un compte",
+      "token": "Se connecter avec un token"
+    },
+    "register": {
+      "emailLabel": "Adresse e-mail",
+      "emailPlaceholder": "vous@entreprise.com",
+      "submitButton": "Créer un compte",
+      "success": {
+        "title": "Compte créé !",
+        "description": "Copiez votre token API maintenant — il ne sera plus affiché.",
+        "copyButton": "Copier",
+        "copiedButton": "Copié !",
+        "continueButton": "Accéder au tableau de bord"
+      }
+    },
+    "tokenLogin": {
+      "label": "Token API",
+      "placeholder": "Collez votre token de 64 caractères",
+      "hint": "Vous l'avez reçu lors de votre inscription.",
+      "submitButton": "Se connecter",
+      "invalidFormat": "Le token doit contenir 64 caractères hexadécimaux.",
+      "invalidToken": "Token invalide. Vérifiez que vous l'avez copié correctement."
+    },
+    "cliHint": "Vous utilisez le CLI ?",
+    "errors": {
+      "registrationFailed": "Échec de l'inscription"
+    }
+  },
+  "dashboard": {
+    "title": "Projets",
+    "subtitle": "Chaque projet contient vos variables d'environnement chiffrées.",
+    "newProject": "Nouveau projet",
+    "empty": {
+      "message": "Aucun projet pour l'instant",
+      "description": "Créez un projet pour commencer à synchroniser vos variables.",
+      "button": "Créer votre premier projet"
+    },
+    "createModal": {
+      "title": "Nouveau projet",
+      "nameLabel": "Nom du projet",
+      "namePlaceholder": "mon-api",
+      "nameHint": "Lettres, chiffres, tirets et underscores uniquement.",
+      "cancelButton": "Annuler",
+      "createButton": "Créer"
+    },
+    "deleteModal": {
+      "title": "Supprimer le projet",
+      "confirmMessage": "Voulez-vous vraiment supprimer {name} ? Toutes ses variables d'environnement seront définitivement supprimées.",
+      "cancelButton": "Annuler",
+      "deleteButton": "Supprimer"
+    },
+    "toast": {
+      "created": "Projet « {name} » créé",
+      "deleted": "Projet supprimé"
+    }
+  },
+  "project": {
+    "breadcrumb": "Projets",
+    "editButton": "Modifier les variables",
+    "environments": {
+      "development": "Développement",
+      "staging": "Staging",
+      "production": "Production"
+    },
+    "editMode": {
+      "label": "Modifier les variables {env}",
+      "hint": "Une paire CLÉ=VALEUR par ligne. Les lignes commençant par # sont ignorées.",
+      "encryptionNote": "Les valeurs sont chiffrées avec AES-256-GCM avant d'être stockées.",
+      "cancelButton": "Annuler",
+      "saveButton": "Enregistrer dans {env}",
+      "noVariablesError": "Aucune paire CLÉ=VALEUR valide trouvée"
+    },
+    "viewMode": {
+      "searchPlaceholder": "Rechercher des variables...",
+      "empty": {
+        "message": "Aucune variable pour {env}",
+        "description": "Cliquez sur « Modifier les variables » pour en ajouter.",
+        "button": "Ajouter des variables"
+      },
+      "table": {
+        "keyHeader": "Clé",
+        "valueHeader": "Valeur",
+        "reveal": "Afficher",
+        "hide": "Masquer",
+        "copy": "Copier CLÉ=VALEUR",
+        "copied": "Copié dans le presse-papiers"
+      },
+      "footer": {
+        "variableCount": "{count, plural, one {# variable} other {# variables}}",
+        "encryption": "Toutes les valeurs sont chiffrées avec AES-256-GCM"
+      }
+    },
+    "exportButton": "Exporter .env",
+    "deleteProjectTitle": "Supprimer le projet",
+    "toast": {
+      "saved": "Variables {env} enregistrées"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "account": {
+      "sectionTitle": "Compte",
+      "emailLabel": "E-mail",
+      "userIdLabel": "Identifiant utilisateur"
+    },
+    "apiToken": {
+      "sectionTitle": "Token API",
+      "description": "Votre token est stocké localement dans ce navigateur. Il n'a été affiché qu'une seule fois lors de l'inscription — si vous l'avez perdu, déconnectez-vous et créez un nouveau compte.",
+      "cliHint": "Utilisez ce token avec le CLI :"
+    },
+    "language": {
+      "sectionTitle": "Langue",
+      "label": "Langue d'affichage"
+    },
+    "dangerZone": {
+      "sectionTitle": "Zone de danger",
+      "signOutTitle": "Se déconnecter",
+      "signOutDescription": "Supprime votre token de ce navigateur.",
+      "signOutButton": "Se déconnecter"
+    }
+  }
+}

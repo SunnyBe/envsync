@@ -1,0 +1,134 @@
+{
+  "layout": {
+    "nav": {
+      "projects": "Proyectos",
+      "settings": "Configuración"
+    },
+    "signOut": "Cerrar sesión"
+  },
+  "login": {
+    "title": "EnvSync",
+    "subtitle": "Sincroniza las variables de entorno con tu equipo",
+    "tabs": {
+      "register": "Crear cuenta",
+      "token": "Iniciar sesión con token"
+    },
+    "register": {
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@empresa.com",
+      "submitButton": "Crear cuenta",
+      "success": {
+        "title": "¡Cuenta creada!",
+        "description": "Copia tu token API ahora — no se mostrará de nuevo.",
+        "copyButton": "Copiar",
+        "copiedButton": "¡Copiado!",
+        "continueButton": "Ir al panel"
+      }
+    },
+    "tokenLogin": {
+      "label": "Token API",
+      "placeholder": "Pega tu token de 64 caracteres",
+      "hint": "Lo recibiste cuando te registraste.",
+      "submitButton": "Iniciar sesión",
+      "invalidFormat": "El token debe ser una cadena hexadecimal de 64 caracteres.",
+      "invalidToken": "Token inválido. Verifica que lo hayas copiado correctamente."
+    },
+    "cliHint": "¿Usas el CLI?",
+    "errors": {
+      "registrationFailed": "Error al registrarse"
+    }
+  },
+  "dashboard": {
+    "title": "Proyectos",
+    "subtitle": "Cada proyecto almacena tus variables de entorno cifradas.",
+    "newProject": "Nuevo proyecto",
+    "empty": {
+      "message": "Aún no hay proyectos",
+      "description": "Crea un proyecto para empezar a sincronizar variables.",
+      "button": "Crear tu primer proyecto"
+    },
+    "createModal": {
+      "title": "Nuevo proyecto",
+      "nameLabel": "Nombre del proyecto",
+      "namePlaceholder": "mi-api",
+      "nameHint": "Solo letras, números, guiones y guiones bajos.",
+      "cancelButton": "Cancelar",
+      "createButton": "Crear"
+    },
+    "deleteModal": {
+      "title": "Eliminar proyecto",
+      "confirmMessage": "¿Seguro que quieres eliminar {name}? Se eliminarán permanentemente todas sus variables de entorno.",
+      "cancelButton": "Cancelar",
+      "deleteButton": "Eliminar"
+    },
+    "toast": {
+      "created": "Proyecto «{name}» creado",
+      "deleted": "Proyecto eliminado"
+    }
+  },
+  "project": {
+    "breadcrumb": "Proyectos",
+    "editButton": "Editar variables",
+    "environments": {
+      "development": "Desarrollo",
+      "staging": "Staging",
+      "production": "Producción"
+    },
+    "editMode": {
+      "label": "Editar variables de {env}",
+      "hint": "Un par CLAVE=VALOR por línea. Las líneas que empiezan con # se ignoran.",
+      "encryptionNote": "Los valores se cifran con AES-256-GCM antes de almacenarse.",
+      "cancelButton": "Cancelar",
+      "saveButton": "Guardar en {env}",
+      "noVariablesError": "No se encontraron pares CLAVE=VALOR válidos"
+    },
+    "viewMode": {
+      "searchPlaceholder": "Buscar variables...",
+      "empty": {
+        "message": "No hay variables para {env}",
+        "description": "Haz clic en «Editar variables» para añadirlas.",
+        "button": "Añadir variables"
+      },
+      "table": {
+        "keyHeader": "Clave",
+        "valueHeader": "Valor",
+        "reveal": "Mostrar",
+        "hide": "Ocultar",
+        "copy": "Copiar CLAVE=VALOR",
+        "copied": "Copiado al portapapeles"
+      },
+      "footer": {
+        "variableCount": "{count, plural, one {# variable} other {# variables}}",
+        "encryption": "Todos los valores están cifrados con AES-256-GCM"
+      }
+    },
+    "exportButton": "Exportar .env",
+    "deleteProjectTitle": "Eliminar proyecto",
+    "toast": {
+      "saved": "Variables de {env} guardadas"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "account": {
+      "sectionTitle": "Cuenta",
+      "emailLabel": "Correo electrónico",
+      "userIdLabel": "ID de usuario"
+    },
+    "apiToken": {
+      "sectionTitle": "Token API",
+      "description": "Tu token se almacena localmente en este navegador. Se mostró una vez al registrarte — si lo perdiste, cierra sesión y crea una nueva cuenta.",
+      "cliHint": "Usa este token con el CLI:"
+    },
+    "language": {
+      "sectionTitle": "Idioma",
+      "label": "Idioma de visualización"
+    },
+    "dangerZone": {
+      "sectionTitle": "Zona de peligro",
+      "signOutTitle": "Cerrar sesión",
+      "signOutDescription": "Elimina tu token de este navegador.",
+      "signOutButton": "Cerrar sesión"
+    }
+  }
+}

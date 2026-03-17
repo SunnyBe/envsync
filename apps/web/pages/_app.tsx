@@ -3,8 +3,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { NextIntlClientProvider } from 'next-intl';
 import { AuthProvider } from '@/context/AuthContext';
+import { LocaleProvider, useLocale } from '@/context/LocaleContext';
 import { initAnalytics } from '@/lib/analytics';
-import enMessages from '../messages/en.json';
 import '../styles/globals.css';
 
 // Analytics initialised once on first client render (no-op without NEXT_PUBLIC_POSTHOG_KEY)
@@ -20,9 +20,11 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+// Separate component so it can consume LocaleContext
+function AppWithLocale({ Component, pageProps }: AppProps) {
+  const { locale, messages } = useLocale();
   return (
-    <NextIntlClientProvider locale="en" messages={enMessages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <Component {...pageProps} />
@@ -33,5 +35,13 @@ export default function App({ Component, pageProps }: AppProps) {
         </AuthProvider>
       </QueryClientProvider>
     </NextIntlClientProvider>
+  );
+}
+
+export default function App(props: AppProps) {
+  return (
+    <LocaleProvider>
+      <AppWithLocale {...props} />
+    </LocaleProvider>
   );
 }
