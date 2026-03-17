@@ -11,7 +11,7 @@ export async function pushHandler(req: AuthRequest, res: Response, next: NextFun
       res.status(400).json({ error: parsed.error.issues[0].message });
       return;
     }
-    await envService.pushVariables({ projectId, env: parsed.data.env, variables: parsed.data.variables });
+    await envService.pushVariables({ projectId, env: parsed.data.env, variables: parsed.data.variables, requesterId: req.user!.id });
     res.json({ ok: true });
   } catch (err) {
     next(err);
@@ -28,7 +28,7 @@ export async function pullHandler(req: AuthRequest, res: Response, next: NextFun
       res.status(400).json({ error: parsed.error.issues[0].message });
       return;
     }
-    const result = await envService.pullVariables(parsed.data);
+    const result = await envService.pullVariables({ ...parsed.data, requesterId: req.user!.id });
     res.json(result);
   } catch (err) {
     next(err);

@@ -20,3 +20,12 @@ export async function register(req: Request, res: Response, next: NextFunction):
 export function me(req: AuthRequest, res: Response): void {
   res.json({ email: req.user!.email, id: req.user!.id });
 }
+
+export async function regenerate(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await authService.regenerateToken(req.user!.id);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}

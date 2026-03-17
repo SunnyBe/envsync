@@ -2,6 +2,7 @@
   "layout": {
     "nav": {
       "projects": "Proyectos",
+      "activity": "Actividad",
       "settings": "Configuración"
     },
     "signOut": "Cerrar sesión"
@@ -113,22 +114,90 @@
     "account": {
       "sectionTitle": "Cuenta",
       "emailLabel": "Correo electrónico",
-      "userIdLabel": "ID de usuario"
+      "userIdLabel": "ID de usuario",
+      "copyEmail": "Copiar correo",
+      "copyId": "Copiar ID",
+      "copied": "¡Copiado!"
     },
     "apiToken": {
       "sectionTitle": "Token API",
       "description": "Tu token se almacena localmente en este navegador. Se mostró una vez al registrarte — si lo perdiste, cierra sesión y crea una nueva cuenta.",
-      "cliHint": "Usa este token con el CLI:"
+      "cliHint": "Usa este token con el CLI:",
+      "regenerateTitle": "Regenerar token",
+      "regenerateDescription": "Crea un nuevo token e invalida el actual. El CLI y los scripts que usen el token antiguo dejarán de funcionar.",
+      "regenerateButton": "Regenerar",
+      "regenerateConfirmTitle": "¿Regenerar token API?",
+      "regenerateConfirmMessage": "Tu token actual quedará invalidado de inmediato. Las sesiones de CLI o scripts que lo usen deberán actualizarse con el nuevo token.",
+      "regenerateConfirmButton": "Sí, regenerar",
+      "regenerateCancelButton": "Cancelar",
+      "newTokenTitle": "Nuevo token generado",
+      "newTokenDescription": "Cópialo ahora — no se mostrará de nuevo.",
+      "newTokenCopy": "Copiar token",
+      "newTokenCopied": "¡Copiado!",
+      "newTokenDone": "Listo"
     },
     "language": {
       "sectionTitle": "Idioma",
       "label": "Idioma de visualización"
+    },
+    "help": {
+      "sectionTitle": "Ayuda y soporte",
+      "docsTitle": "Documentación",
+      "docsDescription": "Lee la documentación completa del CLI y la API.",
+      "docsLink": "Ver docs",
+      "issuesTitle": "Reportar un problema",
+      "issuesDescription": "¿Encontraste un error o tienes una sugerencia? Abre un issue en GitHub.",
+      "issuesLink": "Abrir issue",
+      "emailTitle": "Contáctanos",
+      "emailDescription": "Contáctanos directamente para preguntas de facturación o empresariales.",
+      "emailLink": "Enviar correo"
     },
     "dangerZone": {
       "sectionTitle": "Zona de peligro",
       "signOutTitle": "Cerrar sesión",
       "signOutDescription": "Elimina tu token de este navegador.",
       "signOutButton": "Cerrar sesión"
+    }
+  },
+  "activity": {
+    "title": "Actividad",
+    "subtitle": "Registro de auditoría de todas las acciones realizadas en tu cuenta.",
+    "empty": {
+      "message": "Sin actividad aún",
+      "description": "Las acciones como sincronizar variables, gestionar proyectos y cambios de token aparecerán aquí."
+    },
+    "actions": {
+      "project.create": "Proyecto creado",
+      "project.delete": "Proyecto eliminado",
+      "env.push": "Variables sincronizadas",
+      "env.pull": "Variables obtenidas",
+      "auth.regenerate_token": "Token API regenerado",
+      "member.invite": "Miembro invitado",
+      "member.remove": "Miembro eliminado",
+      "member.accept": "Invitación aceptada"
+    }
+  },
+  "members": {
+    "tabLabel": "Miembros",
+    "inviteTitle": "Invitar miembro",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "colega@empresa.com",
+    "roleLabel": "Rol",
+    "roleEditor": "Editor",
+    "roleViewer": "Lector",
+    "roleEditorHint": "Puede sincronizar y obtener variables",
+    "roleViewerHint": "Solo puede obtener variables",
+    "inviteButton": "Enviar invitación",
+    "copyLink": "Copiar enlace de invitación",
+    "linkCopied": "¡Enlace copiado!",
+    "pending": "Pendiente",
+    "accepted": "Aceptado",
+    "removeButton": "Eliminar",
+    "removeConfirm": "¿Eliminar a {email} de este proyecto?",
+    "empty": "Sin miembros aún. Invita a un compañero para colaborar.",
+    "toast": {
+      "invited": "Enlace de invitación generado para {email}",
+      "removed": "Miembro eliminado"
     }
   }
 }

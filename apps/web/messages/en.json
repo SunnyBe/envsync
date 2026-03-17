@@ -2,6 +2,7 @@
   "layout": {
     "nav": {
       "projects": "Projects",
+      "activity": "Activity",
       "settings": "Settings"
     },
     "signOut": "Sign out"
@@ -113,22 +114,90 @@
     "account": {
       "sectionTitle": "Account",
       "emailLabel": "Email",
-      "userIdLabel": "User ID"
+      "userIdLabel": "User ID",
+      "copyEmail": "Copy email",
+      "copyId": "Copy ID",
+      "copied": "Copied!"
     },
     "apiToken": {
       "sectionTitle": "API Token",
       "description": "Your token is stored locally in this browser. It was shown once at registration — if you've lost it, sign out and register a new account.",
-      "cliHint": "Use this token with the CLI:"
+      "cliHint": "Use this token with the CLI:",
+      "regenerateTitle": "Regenerate token",
+      "regenerateDescription": "Creates a new token and invalidates the current one. The CLI and any scripts using the old token will stop working.",
+      "regenerateButton": "Regenerate",
+      "regenerateConfirmTitle": "Regenerate API token?",
+      "regenerateConfirmMessage": "Your current token will be immediately invalidated. Any CLI sessions or scripts using it will need to be updated with the new token.",
+      "regenerateConfirmButton": "Yes, regenerate",
+      "regenerateCancelButton": "Cancel",
+      "newTokenTitle": "New token generated",
+      "newTokenDescription": "Copy it now — it will not be shown again.",
+      "newTokenCopy": "Copy token",
+      "newTokenCopied": "Copied!",
+      "newTokenDone": "Done"
     },
     "language": {
       "sectionTitle": "Language",
       "label": "Display language"
+    },
+    "help": {
+      "sectionTitle": "Help & Support",
+      "docsTitle": "Documentation",
+      "docsDescription": "Read the full docs for the CLI and API.",
+      "docsLink": "View docs",
+      "issuesTitle": "Report an issue",
+      "issuesDescription": "Found a bug or have a feature request? Open a GitHub issue.",
+      "issuesLink": "Open issue",
+      "emailTitle": "Contact us",
+      "emailDescription": "Reach out directly for billing or enterprise questions.",
+      "emailLink": "Send email"
     },
     "dangerZone": {
       "sectionTitle": "Danger zone",
       "signOutTitle": "Sign out",
       "signOutDescription": "Removes your token from this browser.",
       "signOutButton": "Sign out"
+    }
+  },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Audit trail of all actions performed in your account.",
+    "empty": {
+      "message": "No activity yet",
+      "description": "Actions like pushing variables, managing projects, and token changes will appear here."
+    },
+    "actions": {
+      "project.create": "Created project",
+      "project.delete": "Deleted project",
+      "env.push": "Pushed variables",
+      "env.pull": "Pulled variables",
+      "auth.regenerate_token": "Regenerated API token",
+      "member.invite": "Invited member",
+      "member.remove": "Removed member",
+      "member.accept": "Accepted invite"
+    }
+  },
+  "members": {
+    "tabLabel": "Members",
+    "inviteTitle": "Invite member",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "colleague@company.com",
+    "roleLabel": "Role",
+    "roleEditor": "Editor",
+    "roleViewer": "Viewer",
+    "roleEditorHint": "Can push and pull variables",
+    "roleViewerHint": "Can only pull variables",
+    "inviteButton": "Send invite",
+    "copyLink": "Copy invite link",
+    "linkCopied": "Link copied!",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "removeButton": "Remove",
+    "removeConfirm": "Remove {email} from this project?",
+    "empty": "No members yet. Invite a teammate to collaborate.",
+    "toast": {
+      "invited": "Invite link generated for {email}",
+      "removed": "Member removed"
     }
   }
 }

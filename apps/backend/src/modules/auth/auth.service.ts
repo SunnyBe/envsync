@@ -1,12 +1,12 @@
 import crypto from 'crypto';
 import prisma from '../../infrastructure/prisma/client';
 import logger from '../../infrastructure/logger';
+import { recordAudit } from '../audit/audit.service';
 import { RegisterInput, RegisterOutput } from './auth.types';
 
 export async function registerUser(input: RegisterInput): Promise<RegisterOutput> {
   const { email } = input;
 
-  // Find by email only — we need to inspect isActive ourselves
   const existing = await prisma.user.findUnique({ where: { email } });
 
   if (existing && !existing.isActive) {
@@ -26,7 +26,14 @@ export async function registerUser(input: RegisterInput): Promise<RegisterOutput
   const apiToken = crypto.randomBytes(32).toString('hex');
   const user = await prisma.user.create({ data: { email, apiToken } });
 
-  logger.info({ audit: true, action: 'user.register', userId: user.id, email: user.email }, 'audit');
+  await recordAudit({ userId: user.id, action: 'auth.register', metadata: { email: user.email } });
 
   return { id: user.id, email: user.email, apiToken: user.apiToken };
+}
+
+export async function regenerateToken(userId: string): Promise<{ apiToken: string }> {
+  const apiToken = crypto.randomBytes(32).toString('hex');
+  await prisma.user.update({ where: { id: userId }, data: { apiToken } });
+  await recordAudit({ userId, action: 'auth.regenerate_token' });
+  return { apiToken };
 }

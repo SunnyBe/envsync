@@ -1,5 +1,6 @@
 import prisma from '../../infrastructure/prisma/client';
 import logger from '../../infrastructure/logger';
+import { recordAudit } from '../audit/audit.service';
 import { CreateProjectInput, ProjectOutput } from './projects.types';
 
 export async function createProject(input: CreateProjectInput): Promise<ProjectOutput> {
@@ -23,7 +24,15 @@ export async function createProject(input: CreateProjectInput): Promise<ProjectO
   }
 
   const project = await prisma.project.create({ data: { name, ownerId } });
-  logger.info({ audit: true, action: 'project.create', projectId: project.id, ownerId }, 'audit');
+
+  await recordAudit({
+    userId: ownerId,
+    action: 'project.create',
+    resourceType: 'project',
+    resourceId: project.id,
+    metadata: { name },
+  });
+
   return { id: project.id, name: project.name, createdAt: project.createdAt };
 }
 
@@ -37,7 +46,13 @@ export async function deleteProject(projectId: string, ownerId: string): Promise
   }
 
   await prisma.project.update({ where: { id: projectId }, data: { isActive: false } });
-  logger.info({ audit: true, action: 'project.delete', projectId, ownerId }, 'audit');
+
+  await recordAudit({
+    userId: ownerId,
+    action: 'project.delete',
+    resourceType: 'project',
+    resourceId: projectId,
+  });
 }
 
 export async function listProjects(ownerId: string): Promise<ProjectOutput[]> {

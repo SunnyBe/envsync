@@ -24,6 +24,15 @@ export function Layout({ children }: Props) {
       ),
     },
     {
+      href: '/activity',
+      label: t('nav.activity'),
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+        </svg>
+      ),
+    },
+    {
       href: '/settings',
       label: t('nav.settings'),
       icon: (

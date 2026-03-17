@@ -2,9 +2,48 @@ import prisma from '../../infrastructure/prisma/client';
 import { encrypt, decrypt } from '../../services/encryption/encryption.service';
 import { PushEnvInput, PullEnvInput, PullEnvOutput } from './env.types';
 import logger from '../../infrastructure/logger';
+import { recordAudit } from '../audit/audit.service';
 
-export async function pushVariables(input: PushEnvInput): Promise<void> {
-  const { projectId, env, variables } = input;
+async function checkProjectAccess(
+  projectId: string,
+  requesterId: string,
+  requiredRole: 'EDITOR' | 'VIEWER',
+): Promise<void> {
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+
+  if (!project || !project.isActive) {
+    const err: any = new Error('Project not found');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  // Owner always has full access
+  if (project.ownerId === requesterId) return;
+
+  // Check membership
+  const member = await prisma.projectMember.findFirst({
+    where: { projectId, userId: requesterId, acceptedAt: { not: null } },
+  });
+
+  if (!member) {
+    const err: any = new Error('Access denied');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  // Viewer cannot push
+  if (requiredRole === 'EDITOR' && member.role === 'VIEWER') {
+    const err: any = new Error('You have viewer access — editing is not allowed');
+    err.statusCode = 403;
+    throw err;
+  }
+}
+
+export async function pushVariables(input: PushEnvInput & { requesterId: string }): Promise<void> {
+  const { projectId, env, variables, requesterId } = input;
+
+  await checkProjectAccess(projectId, requesterId, 'EDITOR');
+
   for (const [key, value] of Object.entries(variables)) {
     const valueEnc = encrypt(value);
     await prisma.envVariable.upsert({
@@ -13,11 +52,21 @@ export async function pushVariables(input: PushEnvInput): Promise<void> {
       create: { projectId, key, valueEnc, env },
     });
   }
-  logger.info({ audit: true, action: 'env.push', projectId, env, count: Object.keys(variables).length }, 'audit');
+
+  await recordAudit({
+    userId: requesterId,
+    action: 'env.push',
+    resourceType: 'project',
+    resourceId: projectId,
+    metadata: { env, count: Object.keys(variables).length },
+  });
 }
 
-export async function pullVariables(input: PullEnvInput): Promise<PullEnvOutput> {
-  const { projectId, env } = input;
+export async function pullVariables(input: PullEnvInput & { requesterId: string }): Promise<PullEnvOutput> {
+  const { projectId, env, requesterId } = input;
+
+  await checkProjectAccess(projectId, requesterId, 'VIEWER');
+
   const records = await prisma.envVariable.findMany({
     where: { projectId, env, isActive: true },
   });
@@ -25,6 +74,14 @@ export async function pullVariables(input: PullEnvInput): Promise<PullEnvOutput>
   for (const record of records) {
     variables[record.key] = decrypt(record.valueEnc);
   }
-  logger.info({ audit: true, action: 'env.pull', projectId, env, count: records.length }, 'audit');
+
+  await recordAudit({
+    userId: requesterId,
+    action: 'env.pull',
+    resourceType: 'project',
+    resourceId: projectId,
+    metadata: { env, count: records.length },
+  });
+
   return { variables };
 }

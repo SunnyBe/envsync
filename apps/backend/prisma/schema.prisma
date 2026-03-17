@@ -14,7 +14,9 @@ model User {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
-  projects  Project[]
+  projects    Project[]
+  auditEvents AuditEvent[]
+  memberships ProjectMember[]
 }
 
 model Project {
@@ -26,6 +28,7 @@ model Project {
 
   owner     User          @relation(fields: [ownerId], references: [id])
   variables EnvVariable[]
+  members   ProjectMember[]
 
   @@unique([name, ownerId])
 }
@@ -42,4 +45,40 @@ model EnvVariable {
   project   Project  @relation(fields: [projectId], references: [id])
 
   @@unique([projectId, key, env])
+}
+
+model AuditEvent {
+  id           String   @id @default(uuid())
+  userId       String
+  action       String
+  resourceType String?
+  resourceId   String?
+  metadata     Json?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model ProjectMember {
+  id          String     @id @default(uuid())
+  projectId   String
+  email       String
+  userId      String?
+  role        MemberRole @default(VIEWER)
+  inviteToken String     @unique
+  acceptedAt  DateTime?
+  createdAt   DateTime   @default(now())
+
+  project Project @relation(fields: [projectId], references: [id])
+  user    User?   @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, email])
+}
+
+enum MemberRole {
+  EDITOR
+  VIEWER
 }

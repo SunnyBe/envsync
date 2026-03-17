@@ -76,3 +76,46 @@ export const pushEnvVars = (
   apiClient
     .post<{ ok: boolean }>(`/projects/${projectId}/env`, { variables }, { params: { env } })
     .then((r) => r.data);
+
+// ── Auth extras ───────────────────────────────────────────────────────────────
+
+export const regenerateToken = () =>
+  apiClient.post<{ apiToken: string }>('/auth/regenerate').then((r) => r.data);
+
+// ── Audit ─────────────────────────────────────────────────────────────────────
+
+export interface AuditEvent {
+  id: string;
+  action: string;
+  resourceType: string | null;
+  resourceId: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export const getAuditEvents = () =>
+  apiClient.get<{ events: AuditEvent[] }>('/audit').then((r) => r.data.events);
+
+// ── Members ───────────────────────────────────────────────────────────────────
+
+export interface ProjectMember {
+  id: string;
+  email: string;
+  role: 'EDITOR' | 'VIEWER';
+  acceptedAt: string | null;
+  inviteToken: string;
+  createdAt: string;
+}
+
+export const getMembers = (projectId: string) =>
+  apiClient
+    .get<{ members: ProjectMember[] }>(`/projects/${projectId}/members`)
+    .then((r) => r.data.members);
+
+export const inviteMember = (projectId: string, email: string, role: 'EDITOR' | 'VIEWER') =>
+  apiClient
+    .post<{ inviteToken: string }>(`/projects/${projectId}/members`, { email, role })
+    .then((r) => r.data);
+
+export const removeMember = (projectId: string, memberId: string) =>
+  apiClient.delete(`/projects/${projectId}/members/${memberId}`);

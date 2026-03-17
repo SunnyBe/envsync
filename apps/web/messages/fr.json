@@ -2,6 +2,7 @@
   "layout": {
     "nav": {
       "projects": "Projets",
+      "activity": "Activité",
       "settings": "Paramètres"
     },
     "signOut": "Se déconnecter"
@@ -113,22 +114,90 @@
     "account": {
       "sectionTitle": "Compte",
       "emailLabel": "E-mail",
-      "userIdLabel": "Identifiant utilisateur"
+      "userIdLabel": "Identifiant utilisateur",
+      "copyEmail": "Copier l'e-mail",
+      "copyId": "Copier l'identifiant",
+      "copied": "Copié !"
     },
     "apiToken": {
       "sectionTitle": "Token API",
       "description": "Votre token est stocké localement dans ce navigateur. Il n'a été affiché qu'une seule fois lors de l'inscription — si vous l'avez perdu, déconnectez-vous et créez un nouveau compte.",
-      "cliHint": "Utilisez ce token avec le CLI :"
+      "cliHint": "Utilisez ce token avec le CLI :",
+      "regenerateTitle": "Régénérer le token",
+      "regenerateDescription": "Crée un nouveau token et invalide le token actuel. Le CLI et les scripts utilisant l'ancien token ne fonctionneront plus.",
+      "regenerateButton": "Régénérer",
+      "regenerateConfirmTitle": "Régénérer le token API ?",
+      "regenerateConfirmMessage": "Votre token actuel sera immédiatement invalidé. Les sessions CLI ou scripts l'utilisant devront être mis à jour avec le nouveau token.",
+      "regenerateConfirmButton": "Oui, régénérer",
+      "regenerateCancelButton": "Annuler",
+      "newTokenTitle": "Nouveau token généré",
+      "newTokenDescription": "Copiez-le maintenant — il ne sera plus affiché.",
+      "newTokenCopy": "Copier le token",
+      "newTokenCopied": "Copié !",
+      "newTokenDone": "Terminé"
     },
     "language": {
       "sectionTitle": "Langue",
       "label": "Langue d'affichage"
+    },
+    "help": {
+      "sectionTitle": "Aide & Support",
+      "docsTitle": "Documentation",
+      "docsDescription": "Lisez la documentation complète du CLI et de l'API.",
+      "docsLink": "Voir la doc",
+      "issuesTitle": "Signaler un problème",
+      "issuesDescription": "Un bug ou une suggestion ? Ouvrez un ticket GitHub.",
+      "issuesLink": "Ouvrir un ticket",
+      "emailTitle": "Nous contacter",
+      "emailDescription": "Contactez-nous directement pour la facturation ou les questions entreprise.",
+      "emailLink": "Envoyer un e-mail"
     },
     "dangerZone": {
       "sectionTitle": "Zone de danger",
       "signOutTitle": "Se déconnecter",
       "signOutDescription": "Supprime votre token de ce navigateur.",
       "signOutButton": "Se déconnecter"
+    }
+  },
+  "activity": {
+    "title": "Activité",
+    "subtitle": "Journal d'audit de toutes les actions effectuées sur votre compte.",
+    "empty": {
+      "message": "Aucune activité pour l'instant",
+      "description": "Les actions comme la synchronisation de variables, la gestion de projets et les changements de token apparaîtront ici."
+    },
+    "actions": {
+      "project.create": "Projet créé",
+      "project.delete": "Projet supprimé",
+      "env.push": "Variables synchronisées",
+      "env.pull": "Variables récupérées",
+      "auth.regenerate_token": "Token API régénéré",
+      "member.invite": "Membre invité",
+      "member.remove": "Membre supprimé",
+      "member.accept": "Invitation acceptée"
+    }
+  },
+  "members": {
+    "tabLabel": "Membres",
+    "inviteTitle": "Inviter un membre",
+    "emailLabel": "Adresse e-mail",
+    "emailPlaceholder": "collegue@entreprise.com",
+    "roleLabel": "Rôle",
+    "roleEditor": "Éditeur",
+    "roleViewer": "Lecteur",
+    "roleEditorHint": "Peut synchroniser et récupérer les variables",
+    "roleViewerHint": "Peut uniquement récupérer les variables",
+    "inviteButton": "Envoyer l'invitation",
+    "copyLink": "Copier le lien d'invitation",
+    "linkCopied": "Lien copié !",
+    "pending": "En attente",
+    "accepted": "Accepté",
+    "removeButton": "Supprimer",
+    "removeConfirm": "Retirer {email} de ce projet ?",
+    "empty": "Aucun membre. Invitez un collègue pour collaborer.",
+    "toast": {
+      "invited": "Lien d'invitation généré pour {email}",
+      "removed": "Membre supprimé"
     }
   }
 }
