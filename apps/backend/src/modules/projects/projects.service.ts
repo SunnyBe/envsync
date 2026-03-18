@@ -85,6 +85,16 @@ export async function renameProject(
   return { id: updated.id, name: updated.name, createdAt: updated.createdAt };
 }
 
+export async function getProject(projectId: string, ownerId: string): Promise<ProjectOutput> {
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+
+  if (!project || !project.isActive || project.ownerId !== ownerId) {
+    throw new AppError('Project not found', 404);
+  }
+
+  return { id: project.id, name: project.name, createdAt: project.createdAt };
+}
+
 export async function listProjects(ownerId: string): Promise<ProjectOutput[]> {
   const projects = await prisma.project.findMany({
     where: { ownerId, isActive: true },

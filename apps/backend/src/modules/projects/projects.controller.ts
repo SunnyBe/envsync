@@ -3,6 +3,19 @@ import { AuthRequest } from '../../middleware/auth.middleware';
 import * as projectsService from './projects.service';
 import { createProjectSchema, renameProjectSchema } from './projects.validation';
 
+export async function getHandler(
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const project = await projectsService.getProject(req.params.id, req.user!.id);
+    res.json({ id: project.id, name: project.name, createdAt: project.createdAt });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function deleteHandler(
   req: AuthRequest,
   res: Response,
