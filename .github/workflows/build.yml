@@ -24,6 +24,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Generate Prisma client
+        run: npm run prisma:generate --workspace=apps/backend
+
       - name: Lint backend
         run: npm run lint --workspace=apps/backend
 
@@ -54,6 +57,9 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Generate Prisma client
+        run: npm run prisma:generate --workspace=apps/backend
 
       - name: Build backend
         run: npm run build --workspace=apps/backend
