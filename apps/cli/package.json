@@ -23,10 +23,12 @@
     "environment-variables"
   ],
   "scripts": {
+    "clean": "rm -rf dist",
     "build": "tsc",
+    "rebuild": "npm run clean && npm run build",
     "dev": "ts-node src/index.ts",
     "start": "node dist/index.js",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run rebuild",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .ts"
