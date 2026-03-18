@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { useLocale } from '@/context/LocaleContext';
-import { getAuditEvents, AuditEvent } from '@/lib/api';
+import { getAuditEvents, getProjects, AuditEvent, Project } from '@/lib/api';
 import { Layout } from '@/components/Layout';
 import { Spinner } from '@/components/ui/Spinner';
 
@@ -158,6 +158,17 @@ export default function ActivityPage() {
     enabled: !!token,
   });
 
+  const { data: projects } = useQuery({
+    queryKey: ['projects'],
+    queryFn: getProjects,
+    enabled: !!token,
+  });
+
+  const projectNameMap = (projects ?? []).reduce<Record<string, string>>((acc, p: Project) => {
+    acc[p.id] = p.name;
+    return acc;
+  }, {});
+
   if (!isReady || !token) return null;
 
   const grouped = groupEventsByDate(events ?? [], locale);
@@ -219,8 +230,11 @@ export default function ActivityPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900">{actionLabel}</p>
                           {event.resourceType && event.resourceId && (
-                            <p className="mt-0.5 text-xs text-gray-400 font-mono truncate">
-                              {event.resourceType}: {event.resourceId}
+                            <p className="mt-0.5 text-xs text-gray-400 truncate">
+                              {event.resourceType === 'project'
+                                ? (projectNameMap[event.resourceId] ??
+                                  `project:${event.resourceId.slice(0, 8)}…`)
+                                : `${event.resourceType}: ${event.resourceId.slice(0, 8)}…`}
                             </p>
                           )}
                           {event.metadata && Object.keys(event.metadata).length > 0 && (

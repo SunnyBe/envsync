@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
+import { useFeatureFlags } from '@/lib/features';
 import {
   getEnvVars,
   pushEnvVars,
@@ -43,6 +44,7 @@ export default function ProjectPage() {
   const tMembers = useTranslations('members');
   const tSettings = useTranslations('project.projectSettings');
 
+  const flags = useFeatureFlags();
   const projectId = router.query.id as string;
   const [displayName, setDisplayName] = useState((router.query.name as string) ?? '');
   const projectName = (displayName || (router.query.name as string)) ?? projectId;
@@ -602,54 +604,58 @@ export default function ProjectPage() {
         {/* ── Members tab ── */}
         {tab === 'members' && (
           <div className="space-y-6">
-            {/* Invite form */}
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="mb-4 text-sm font-semibold text-gray-700">
-                {tMembers('inviteTitle')}
-              </h3>
-              <div className="flex gap-3">
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  placeholder={tMembers('emailPlaceholder')}
-                  className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-300 focus:outline-none focus:ring-1 focus:ring-indigo-200"
-                />
-                <select
-                  value={inviteRole}
-                  onChange={(e) => setInviteRole(e.target.value as 'EDITOR' | 'VIEWER')}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-indigo-300 focus:outline-none focus:ring-1 focus:ring-indigo-200"
-                >
-                  <option value="EDITOR">{tMembers('roleEditor')}</option>
-                  <option value="VIEWER">{tMembers('roleViewer')}</option>
-                </select>
-                <Button
-                  onClick={() => inviteMutation.mutate()}
-                  loading={inviteMutation.isPending}
-                  disabled={!inviteEmail.trim()}
-                >
-                  {tMembers('inviteButton')}
-                </Button>
-              </div>
-              <p className="mt-2 text-xs text-gray-400">
-                {inviteRole === 'EDITOR' ? tMembers('roleEditorHint') : tMembers('roleViewerHint')}
-              </p>
-
-              {/* Invite link */}
-              {pendingInviteLink && (
-                <div className="mt-4 flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3">
-                  <span className="flex-1 truncate font-mono text-xs text-indigo-700">
-                    {pendingInviteLink}
-                  </span>
-                  <button
-                    onClick={copyInviteLink}
-                    className="shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 transition-colors"
+            {/* Invite form — hidden until email delivery is implemented */}
+            {flags.membersInvite && (
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h3 className="mb-4 text-sm font-semibold text-gray-700">
+                  {tMembers('inviteTitle')}
+                </h3>
+                <div className="flex gap-3">
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder={tMembers('emailPlaceholder')}
+                    className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-300 focus:outline-none focus:ring-1 focus:ring-indigo-200"
+                  />
+                  <select
+                    value={inviteRole}
+                    onChange={(e) => setInviteRole(e.target.value as 'EDITOR' | 'VIEWER')}
+                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:border-indigo-300 focus:outline-none focus:ring-1 focus:ring-indigo-200"
                   >
-                    {linkCopied ? tMembers('linkCopied') : tMembers('copyLink')}
-                  </button>
+                    <option value="EDITOR">{tMembers('roleEditor')}</option>
+                    <option value="VIEWER">{tMembers('roleViewer')}</option>
+                  </select>
+                  <Button
+                    onClick={() => inviteMutation.mutate()}
+                    loading={inviteMutation.isPending}
+                    disabled={!inviteEmail.trim()}
+                  >
+                    {tMembers('inviteButton')}
+                  </Button>
                 </div>
-              )}
-            </div>
+                <p className="mt-2 text-xs text-gray-400">
+                  {inviteRole === 'EDITOR'
+                    ? tMembers('roleEditorHint')
+                    : tMembers('roleViewerHint')}
+                </p>
+
+                {/* Invite link */}
+                {pendingInviteLink && (
+                  <div className="mt-4 flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3">
+                    <span className="flex-1 truncate font-mono text-xs text-indigo-700">
+                      {pendingInviteLink}
+                    </span>
+                    <button
+                      onClick={copyInviteLink}
+                      className="shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 transition-colors"
+                    >
+                      {linkCopied ? tMembers('linkCopied') : tMembers('copyLink')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Members list */}
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
