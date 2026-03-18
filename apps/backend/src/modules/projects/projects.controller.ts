@@ -10,7 +10,12 @@ export async function getHandler(
 ): Promise<void> {
   try {
     const project = await projectsService.getProject(req.params.id, req.user!.id);
-    res.json({ id: project.id, name: project.name, createdAt: project.createdAt });
+    res.json({
+      id: project.id,
+      name: project.name,
+      createdAt: project.createdAt,
+      userRole: project.userRole,
+    });
   } catch (err) {
     next(err);
   }

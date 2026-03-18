@@ -30,6 +30,10 @@ export interface Project {
   createdAt: string;
 }
 
+export interface ProjectDetail extends Project {
+  userRole: 'owner' | 'EDITOR' | 'VIEWER';
+}
+
 export interface RegisterResponse {
   id: string;
   email: string;
@@ -57,6 +61,9 @@ export const getProjects = () =>
 
 export const createProject = (name: string) =>
   apiClient.post<{ id: string; name: string }>('/projects', { name }).then((r) => r.data);
+
+export const getProject = (id: string) =>
+  apiClient.get<ProjectDetail>(`/projects/${id}`).then((r) => r.data);
 
 export const deleteProject = (id: string) => apiClient.delete(`/projects/${id}`);
 

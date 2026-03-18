@@ -110,6 +110,28 @@
     "renameButton": "Rename project",
     "renameSave": "Save",
     "renameCancel": "Cancel",
+    "settingsTab": "Settings",
+    "projectSettings": {
+      "infoTitle": "Project info",
+      "idLabel": "Project ID",
+      "createdLabel": "Created",
+      "copyId": "Copy ID",
+      "copied": "Copied!",
+      "renameTitle": "Rename project",
+      "renameLabel": "Project name",
+      "renamePlaceholder": "my-project",
+      "renameSave": "Save name",
+      "dangerTitle": "Danger zone",
+      "deleteTitle": "Delete project",
+      "deleteDescription": "Permanently deletes all environment variables in this project. This cannot be undone.",
+      "deleteButton": "Delete project",
+      "deleteConfirm": "Are you sure? This cannot be undone.",
+      "deleteConfirmButton": "Yes, delete",
+      "deleteCancelButton": "Cancel",
+      "toast": {
+        "deleted": "Project deleted"
+      }
+    },
     "toast": {
       "saved": "{env} variables saved",
       "deleted": "Variable \"{key}\" deleted",

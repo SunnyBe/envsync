@@ -1,7 +1,7 @@
 import prisma from '../../infrastructure/prisma/client';
 import logger from '../../infrastructure/logger';
 import { recordAudit } from '../audit/audit.service';
-import { CreateProjectInput, ProjectOutput } from './projects.types';
+import { CreateProjectInput, ProjectOutput, ProjectDetailOutput } from './projects.types';
 import { AppError } from '../../infrastructure/errors';
 
 export async function createProject(input: CreateProjectInput): Promise<ProjectOutput> {
@@ -85,14 +85,31 @@ export async function renameProject(
   return { id: updated.id, name: updated.name, createdAt: updated.createdAt };
 }
 
-export async function getProject(projectId: string, ownerId: string): Promise<ProjectOutput> {
+export async function getProject(projectId: string, userId: string): Promise<ProjectDetailOutput> {
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
-  if (!project || !project.isActive || project.ownerId !== ownerId) {
+  if (!project || !project.isActive) {
     throw new AppError('Project not found', 404);
   }
 
-  return { id: project.id, name: project.name, createdAt: project.createdAt };
+  if (project.ownerId === userId) {
+    return { id: project.id, name: project.name, createdAt: project.createdAt, userRole: 'owner' };
+  }
+
+  const member = await prisma.projectMember.findFirst({
+    where: { projectId, userId, acceptedAt: { not: null } },
+  });
+
+  if (!member) {
+    throw new AppError('Project not found', 404);
+  }
+
+  return {
+    id: project.id,
+    name: project.name,
+    createdAt: project.createdAt,
+    userRole: member.role as 'EDITOR' | 'VIEWER',
+  };
 }
 
 export async function listProjects(ownerId: string): Promise<ProjectOutput[]> {

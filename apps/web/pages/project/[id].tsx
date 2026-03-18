@@ -13,8 +13,11 @@ import {
   getMembers,
   inviteMember,
   removeMember,
+  getProject,
+  deleteProject,
   Environment,
   ProjectMember,
+  ProjectDetail,
 } from '@/lib/api';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/Button';
@@ -30,7 +33,7 @@ const ENV_BADGE: Record<Environment, 'blue' | 'yellow' | 'green'> = {
   production: 'green',
 };
 
-type Tab = 'variables' | 'members';
+type Tab = 'variables' | 'members' | 'settings';
 
 export default function ProjectPage() {
   const { token, isReady } = useAuth();
@@ -38,6 +41,7 @@ export default function ProjectPage() {
   const qc = useQueryClient();
   const t = useTranslations('project');
   const tMembers = useTranslations('members');
+  const tSettings = useTranslations('project.projectSettings');
 
   const projectId = router.query.id as string;
   const [displayName, setDisplayName] = useState((router.query.name as string) ?? '');
@@ -60,6 +64,11 @@ export default function ProjectPage() {
   const [pendingInviteLink, setPendingInviteLink] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
 
+  // Settings state
+  const [settingsRenameValue, setSettingsRenameValue] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [idCopied, setIdCopied] = useState(false);
+
   useEffect(() => {
     if (isReady && !token) router.replace('/login');
   }, [isReady, token, router]);
@@ -75,6 +84,15 @@ export default function ProjectPage() {
     queryFn: () => getMembers(projectId),
     enabled: !!token && !!projectId && tab === 'members',
   });
+
+  const { data: projectDetail } = useQuery<ProjectDetail>({
+    queryKey: ['project', projectId],
+    queryFn: () => getProject(projectId),
+    enabled: !!token && !!projectId,
+  });
+
+  const canEditSettings =
+    projectDetail?.userRole === 'owner' || projectDetail?.userRole === 'EDITOR';
 
   const enterEditMode = useCallback(() => {
     setDraftText(
@@ -133,6 +151,16 @@ export default function ProjectPage() {
       setRenaming(false);
       toast.success(t('toast.renamed', { name: data.name }));
       qc.invalidateQueries({ queryKey: ['projects'] });
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: () => deleteProject(projectId),
+    onSuccess: () => {
+      toast.success(tSettings('toast.deleted'));
+      qc.invalidateQueries({ queryKey: ['projects'] });
+      router.push('/dashboard');
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -297,6 +325,18 @@ export default function ProjectPage() {
           >
             {tMembers('tabLabel')}
           </button>
+          {canEditSettings && (
+            <button
+              onClick={() => setTab('settings')}
+              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+                tab === 'settings'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {t('settingsTab')}
+            </button>
+          )}
         </div>
 
         {/* ── Variables tab ── */}
@@ -665,6 +705,111 @@ export default function ProjectPage() {
                 </table>
               )}
             </div>
+          </div>
+        )}
+        {/* ── Settings tab ── */}
+        {tab === 'settings' && canEditSettings && (
+          <div className="space-y-6">
+            {/* Project info */}
+            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-sm font-semibold text-gray-700">{tSettings('infoTitle')}</h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">{tSettings('idLabel')}</span>
+                  <div className="flex items-center gap-2">
+                    <code className="font-mono text-xs text-gray-700">{projectId}</code>
+                    <button
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(projectId);
+                        setIdCopied(true);
+                        setTimeout(() => setIdCopied(false), 2000);
+                      }}
+                      className="rounded px-2 py-1 text-xs text-indigo-600 hover:bg-indigo-50 transition-colors"
+                    >
+                      {idCopied ? tSettings('copied') : tSettings('copyId')}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-500">{tSettings('createdLabel')}</span>
+                  <span className="text-gray-700">
+                    {projectDetail?.createdAt
+                      ? new Date(projectDetail.createdAt).toLocaleDateString()
+                      : '—'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Rename */}
+            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-sm font-semibold text-gray-700">
+                {tSettings('renameTitle')}
+              </h3>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={settingsRenameValue}
+                  onChange={(e) => setSettingsRenameValue(e.target.value)}
+                  placeholder={projectName}
+                  className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:border-indigo-300 focus:outline-none focus:ring-1 focus:ring-indigo-200"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && settingsRenameValue.trim())
+                      renameMutation.mutate(settingsRenameValue.trim());
+                  }}
+                />
+                <Button
+                  onClick={() => renameMutation.mutate(settingsRenameValue.trim())}
+                  loading={renameMutation.isPending}
+                  disabled={!settingsRenameValue.trim()}
+                >
+                  {tSettings('renameSave')}
+                </Button>
+              </div>
+            </div>
+
+            {/* Danger zone — owner only */}
+            {projectDetail?.userRole === 'owner' && (
+              <div className="rounded-xl border border-red-200 bg-red-50/40 p-6">
+                <h3 className="mb-4 text-sm font-semibold text-red-700">
+                  {tSettings('dangerTitle')}
+                </h3>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{tSettings('deleteTitle')}</p>
+                    <p className="mt-1 text-xs text-gray-500">{tSettings('deleteDescription')}</p>
+                  </div>
+                  {!deleteConfirm ? (
+                    <Button variant="danger" size="sm" onClick={() => setDeleteConfirm(true)}>
+                      {tSettings('deleteButton')}
+                    </Button>
+                  ) : (
+                    <div className="flex flex-col items-end gap-2">
+                      <p className="text-xs font-medium text-red-600">
+                        {tSettings('deleteConfirm')}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => setDeleteConfirm(false)}
+                        >
+                          {tSettings('deleteCancelButton')}
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => deleteProjectMutation.mutate()}
+                          loading={deleteProjectMutation.isPending}
+                        >
+                          {tSettings('deleteConfirmButton')}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

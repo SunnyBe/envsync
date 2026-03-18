@@ -110,6 +110,28 @@
     "renameButton": "Renombrar proyecto",
     "renameSave": "Guardar",
     "renameCancel": "Cancelar",
+    "settingsTab": "Configuración",
+    "projectSettings": {
+      "infoTitle": "Información del proyecto",
+      "idLabel": "ID del proyecto",
+      "createdLabel": "Creado",
+      "copyId": "Copiar ID",
+      "copied": "¡Copiado!",
+      "renameTitle": "Renombrar proyecto",
+      "renameLabel": "Nombre del proyecto",
+      "renamePlaceholder": "mi-proyecto",
+      "renameSave": "Guardar nombre",
+      "dangerTitle": "Zona de peligro",
+      "deleteTitle": "Eliminar proyecto",
+      "deleteDescription": "Elimina permanentemente todas las variables de entorno de este proyecto. Esto no se puede deshacer.",
+      "deleteButton": "Eliminar proyecto",
+      "deleteConfirm": "¿Estás seguro? Esto no se puede deshacer.",
+      "deleteConfirmButton": "Sí, eliminar",
+      "deleteCancelButton": "Cancelar",
+      "toast": {
+        "deleted": "Proyecto eliminado"
+      }
+    },
     "toast": {
       "saved": "Variables de {env} guardadas",
       "deleted": "Variable «{key}» eliminada",

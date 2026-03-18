@@ -110,6 +110,28 @@
     "renameButton": "Renommer le projet",
     "renameSave": "Enregistrer",
     "renameCancel": "Annuler",
+    "settingsTab": "Paramètres",
+    "projectSettings": {
+      "infoTitle": "Informations du projet",
+      "idLabel": "ID du projet",
+      "createdLabel": "Créé le",
+      "copyId": "Copier l'ID",
+      "copied": "Copié !",
+      "renameTitle": "Renommer le projet",
+      "renameLabel": "Nom du projet",
+      "renamePlaceholder": "mon-projet",
+      "renameSave": "Enregistrer le nom",
+      "dangerTitle": "Zone dangereuse",
+      "deleteTitle": "Supprimer le projet",
+      "deleteDescription": "Supprime définitivement toutes les variables d'environnement de ce projet. Cette action est irréversible.",
+      "deleteButton": "Supprimer le projet",
+      "deleteConfirm": "Êtes-vous sûr ? Cette action est irréversible.",
+      "deleteConfirmButton": "Oui, supprimer",
+      "deleteCancelButton": "Annuler",
+      "toast": {
+        "deleted": "Projet supprimé"
+      }
+    },
     "toast": {
       "saved": "Variables {env} enregistrées",
       "deleted": "Variable « {key} » supprimée",

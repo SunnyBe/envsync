@@ -8,3 +8,7 @@ export interface ProjectOutput {
   name: string;
   createdAt: Date;
 }
+
+export interface ProjectDetailOutput extends ProjectOutput {
+  userRole: 'owner' | 'EDITOR' | 'VIEWER';
+}
