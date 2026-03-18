@@ -10,7 +10,7 @@ COPY package.json package-lock.json tsconfig.base.json ./
 COPY apps/backend/package.json ./apps/backend/
 COPY packages/shared-types/package.json ./packages/shared-types/
 
-RUN npm install --workspace=apps/backend --workspace=packages/shared-types
+RUN npm install --ignore-scripts --workspace=apps/backend --workspace=packages/shared-types
 
 # Copy source
 COPY apps/backend ./apps/backend
@@ -18,9 +18,9 @@ COPY packages/shared-types ./packages/shared-types
 
 WORKDIR /app/apps/backend
 
-RUN npm run build
-
 RUN npx prisma generate
+
+RUN npm run build
 
 # Copy and permission the startup script
 COPY apps/backend/start.sh ./start.sh
