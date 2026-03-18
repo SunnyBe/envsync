@@ -77,16 +77,16 @@ success "npm ${NPM_VERSION} found"
 step "Installing envsync..."
 
 # Try global install; on some systems npm global requires sudo
-if npm install -g envsync 2>&1; then
+if npm install -g @ndusunday/envsync 2>&1; then
   : # success — continue
 else
   warn "npm install failed — retrying with sudo..."
-  if sudo npm install -g envsync 2>&1; then
+  if sudo npm install -g @ndusunday/envsync 2>&1; then
     : # success with sudo
   else
     error "Installation failed."
-    info  "Try manually: npm install -g envsync"
-    info  "Or without a global install: npx envsync --help"
+    info  "Try manually: npm install -g @ndusunday/envsync"
+    info  "Or without a global install: npx @ndusunday/envsync --help"
     exit 1
   fi
 fi

@@ -1,5 +1,5 @@
 {
-  "name": "envsync",
+  "name": "@ndusunday/envsync",
   "version": "1.0.0",
   "description": "Sync environment variables across your team — CLI tool",
   "license": "MIT",
