@@ -34,9 +34,12 @@ describe('runPush', () => {
       'http://localhost:3001/projects/proj-123/env',
       { variables: { DB_URL: 'postgres://localhost/test', SECRET: 'abc123' } },
       expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-token',
+          'X-EnvSync-Source': 'cli',
+        }),
         params: { env: 'development' },
-        headers: { Authorization: 'Bearer test-token' },
-      })
+      }),
     );
   });
 
@@ -49,13 +52,13 @@ describe('runPush', () => {
 
   it('rejects an invalid environment', async () => {
     await expect(
-      runPush({ project: 'proj-123', env: 'production-bad', file: envFile })
+      runPush({ project: 'proj-123', env: 'production-bad', file: envFile }),
     ).rejects.toThrow('Invalid environment');
   });
 
   it('rejects a missing .env file', async () => {
     await expect(
-      runPush({ project: 'proj-123', env: 'development', file: path.join(tmpDir, 'missing.env') })
+      runPush({ project: 'proj-123', env: 'development', file: path.join(tmpDir, 'missing.env') }),
     ).rejects.toThrow('File not found');
   });
 
@@ -63,7 +66,7 @@ describe('runPush', () => {
     const emptyFile = path.join(tmpDir, 'empty.env');
     fs.writeFileSync(emptyFile, '');
     await expect(
-      runPush({ project: 'proj-123', env: 'development', file: emptyFile })
+      runPush({ project: 'proj-123', env: 'development', file: emptyFile }),
     ).rejects.toThrow('No variables found');
   });
 });

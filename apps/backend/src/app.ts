@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 
 import logger from './infrastructure/logger';
 import { requestIdMiddleware } from './middleware/request-id.middleware';
+import { requestContextMiddleware } from './middleware/request-context.middleware';
 import { errorMiddleware } from './middleware/error.middleware';
 
 import healthRouter from './modules/health/health.routes';
@@ -37,6 +38,7 @@ const authLimiter = rateLimit({
 });
 
 app.use(requestIdMiddleware);
+app.use(requestContextMiddleware);
 app.use(pinoHttp({ logger }));
 // Collect RED metrics for every request — must be registered before route handlers
 app.use(metricsMiddleware);

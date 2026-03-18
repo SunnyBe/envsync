@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import axios from 'axios';
 import chalk from 'chalk';
+import { CLI_SOURCE_HEADER } from '../lib/api';
 import { loadConfig } from '../config/config';
 import { handleError } from '../utils/error';
 
@@ -18,7 +19,7 @@ const listSubcommand = new Command('list')
     try {
       const config = loadConfig();
       const res = await axios.get<{ projects: Project[] }>(`${config.apiUrl}/projects`, {
-        headers: { Authorization: `Bearer ${config.token}` },
+        headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` },
       });
       const projects = res.data.projects;
 
@@ -52,7 +53,7 @@ const createSubcommand = new Command('create')
       const res = await axios.post<Project>(
         `${config.apiUrl}/projects`,
         { name },
-        { headers: { Authorization: `Bearer ${config.token}` } },
+        { headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` } },
       );
       console.log(chalk.green(`✔ Project created`));
       console.log(`  Name: ${chalk.bold(res.data.name)}`);
@@ -71,7 +72,7 @@ const getSubcommand = new Command('get')
     try {
       const config = loadConfig();
       const res = await axios.get<Project>(`${config.apiUrl}/projects/${id}`, {
-        headers: { Authorization: `Bearer ${config.token}` },
+        headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` },
       });
       const p = res.data;
       console.log(`\n  ${chalk.bold(p.name)}`);
@@ -94,7 +95,7 @@ const updateSubcommand = new Command('update')
       const res = await axios.patch<Project>(
         `${config.apiUrl}/projects/${id}`,
         { name: opts.name },
-        { headers: { Authorization: `Bearer ${config.token}` } },
+        { headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` } },
       );
       console.log(chalk.green(`✔ Project renamed to "${res.data.name}"`));
     } catch (err) {
@@ -111,7 +112,7 @@ const deleteSubcommand = new Command('delete')
     try {
       const config = loadConfig();
       await axios.delete(`${config.apiUrl}/projects/${id}`, {
-        headers: { Authorization: `Bearer ${config.token}` },
+        headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` },
       });
       console.log(chalk.green(`✔ Project deleted`));
     } catch (err) {

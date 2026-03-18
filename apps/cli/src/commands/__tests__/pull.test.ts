@@ -33,9 +33,12 @@ describe('runPull', () => {
     expect(mockedAxios.get).toHaveBeenCalledWith(
       'http://localhost:3001/projects/proj-456/env',
       expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-token',
+          'X-EnvSync-Source': 'cli',
+        }),
         params: { env: 'production' },
-        headers: { Authorization: 'Bearer test-token' },
-      })
+      }),
     );
   });
 
@@ -49,7 +52,7 @@ describe('runPull', () => {
 
   it('rejects an invalid environment', async () => {
     await expect(
-      runPull({ project: 'proj-456', env: 'dev', file: path.join(tmpDir, '.env') })
+      runPull({ project: 'proj-456', env: 'dev', file: path.join(tmpDir, '.env') }),
     ).rejects.toThrow('Invalid environment');
   });
 });

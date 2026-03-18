@@ -228,7 +228,23 @@ export default function ActivityPage() {
                           {getActionIcon(event.action)}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900">{actionLabel}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-gray-900">{actionLabel}</p>
+                            {event.source && (
+                              <span
+                                className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gray-500 bg-gray-100"
+                                title={
+                                  event.source === 'cli'
+                                    ? 'Via CLI'
+                                    : event.source === 'web'
+                                      ? 'Via web dashboard'
+                                      : 'Direct API call'
+                                }
+                              >
+                                {t(`source.${event.source}`)}
+                              </span>
+                            )}
+                          </div>
                           {event.resourceType && event.resourceId && (
                             <p className="mt-0.5 text-xs text-gray-400 truncate">
                               {event.resourceType === 'project'

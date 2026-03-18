@@ -2,7 +2,10 @@ import axios, { AxiosError } from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
-export const apiClient = axios.create({ baseURL: API_URL });
+export const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: { 'X-EnvSync-Source': 'web' },
+});
 
 // Attach Bearer token from localStorage before every request
 apiClient.interceptors.request.use((config) => {
@@ -102,6 +105,7 @@ export interface AuditEvent {
   resourceType: string | null;
   resourceId: string | null;
   metadata: Record<string, unknown> | null;
+  source: 'cli' | 'web' | 'manual' | null;
   createdAt: string;
 }
 

@@ -55,6 +55,7 @@ model AuditEvent {
   resourceId   String?
   metadata     Json?
   ipAddress    String?
+  source       String?  // cli | web | manual
   createdAt    DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])

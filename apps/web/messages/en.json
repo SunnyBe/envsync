@@ -191,6 +191,11 @@
   "activity": {
     "title": "Activity",
     "subtitle": "Audit trail of all actions performed in your account.",
+    "source": {
+      "cli": "CLI",
+      "web": "Web",
+      "manual": "API"
+    },
     "empty": {
       "message": "No activity yet",
       "description": "Actions like pushing variables, managing projects, and token changes will appear here."

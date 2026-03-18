@@ -33,10 +33,9 @@ afterEach(() => {
 describe('runLogin', () => {
   it('verifies token against /auth/me before saving', async () => {
     await runLogin({ token: 'mytoken', apiUrl: 'http://localhost:3001' });
-    expect(mockAxios.get).toHaveBeenCalledWith(
-      'http://localhost:3001/auth/me',
-      { headers: { Authorization: 'Bearer mytoken' } }
-    );
+    expect(mockAxios.get).toHaveBeenCalledWith('http://localhost:3001/auth/me', {
+      headers: { 'X-EnvSync-Source': 'cli', Authorization: 'Bearer mytoken' },
+    });
   });
 
   it('saves config to disk on valid token', async () => {
@@ -55,14 +54,16 @@ describe('runLogin', () => {
 
   it('throws if token is empty', async () => {
     await expect(runLogin({ token: '  ', apiUrl: 'http://localhost:3001' })).rejects.toThrow(
-      'Token cannot be empty'
+      'Token cannot be empty',
     );
   });
 
   it('does not save config if API rejects the token', async () => {
     const error = Object.assign(new Error('Request failed'), { response: { status: 401 } });
     mockAxios.get = jest.fn().mockRejectedValue(error);
-    await expect(runLogin({ token: 'bad-token', apiUrl: 'http://localhost:3001' })).rejects.toThrow();
+    await expect(
+      runLogin({ token: 'bad-token', apiUrl: 'http://localhost:3001' }),
+    ).rejects.toThrow();
     const configFile = path.join(tmpDir, '.envsync', 'config.json');
     expect(fs.existsSync(configFile)).toBe(false);
   });

@@ -191,6 +191,11 @@
   "activity": {
     "title": "Activité",
     "subtitle": "Journal d'audit de toutes les actions effectuées sur votre compte.",
+    "source": {
+      "cli": "CLI",
+      "web": "Web",
+      "manual": "API"
+    },
     "empty": {
       "message": "Aucune activité pour l'instant",
       "description": "Les actions comme la synchronisation de variables, la gestion de projets et les changements de token apparaîtront ici."

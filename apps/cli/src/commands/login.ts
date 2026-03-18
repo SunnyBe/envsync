@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { saveConfig } from '../config/config';
 import { handleError } from '../utils/error';
 import { DEFAULT_API_URL } from '../meta';
+import { CLI_SOURCE_HEADER } from '../lib/api';
 
 interface LoginOptions {
   token: string;
@@ -18,7 +19,7 @@ export async function runLogin(opts: LoginOptions): Promise<void> {
 
   // Verify the token is valid before saving it
   const { data } = await axios.get<{ email: string }>(`${url}/auth/me`, {
-    headers: { Authorization: `Bearer ${opts.token.trim()}` },
+    headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${opts.token.trim()}` },
   });
 
   saveConfig({ token: opts.token.trim(), apiUrl: url });

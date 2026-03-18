@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../../infrastructure/prisma/client';
 import logger from '../../infrastructure/logger';
+import { getAuditSource } from '../../middleware/request-context.middleware';
 
 interface RecordAuditParams {
   userId: string;
@@ -12,16 +13,18 @@ interface RecordAuditParams {
 }
 
 export async function recordAudit(params: RecordAuditParams): Promise<void> {
+  const source = getAuditSource();
   const data: Prisma.AuditEventCreateInput = {
     user: { connect: { id: params.userId } },
     action: params.action,
     resourceType: params.resourceType,
     resourceId: params.resourceId,
-    metadata: params.metadata as Prisma.InputJsonValue ?? Prisma.JsonNull,
+    metadata: (params.metadata as Prisma.InputJsonValue) ?? Prisma.JsonNull,
     ipAddress: params.ipAddress,
+    source,
   };
   await prisma.auditEvent.create({ data });
-  logger.info({ audit: true, ...params }, 'audit');
+  logger.info({ audit: true, ...params, source }, 'audit');
 }
 
 export async function getAuditEvents(userId: string, limit = 50) {

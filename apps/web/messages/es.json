@@ -191,6 +191,11 @@
   "activity": {
     "title": "Actividad",
     "subtitle": "Registro de auditoría de todas las acciones realizadas en tu cuenta.",
+    "source": {
+      "cli": "CLI",
+      "web": "Web",
+      "manual": "API"
+    },
     "empty": {
       "message": "Sin actividad aún",
       "description": "Las acciones como sincronizar variables, gestionar proyectos y cambios de token aparecerán aquí."
