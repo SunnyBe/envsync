@@ -12,7 +12,7 @@ export async function runWhoami(): Promise<void> {
   console.log(chalk.green('✔ Logged in'));
   console.log(`  API: ${chalk.cyan(config.apiUrl)}`);
   // Show masked token — never expose the full value
-  const masked = config.token.slice(0, 8) + '••••••••' + config.token.slice(-4);
+  const masked = config.token.slice(0, 4) + '••••••••••••' + config.token.slice(-4);
   console.log(`  Token: ${chalk.dim(masked)}`);
 }
 
