@@ -1,0 +1,45 @@
+name: Publish CLI to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — build and pack without publishing'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  publish:
+    name: Publish @ndusunday/envsync
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build CLI
+        run: npm run rebuild --workspace=apps/cli
+
+      - name: Run tests
+        run: npm test --workspace=apps/cli
+
+      - name: Publish to npm
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "Dry run — skipping publish"
+            npm pack --workspace=apps/cli
+          else
+            npm publish --workspace=apps/cli --access public
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
