@@ -7,8 +7,12 @@ export interface ProjectOutput {
   id: string;
   name: string;
   createdAt: Date;
+  role: 'owner' | 'EDITOR' | 'VIEWER';
 }
 
-export interface ProjectDetailOutput extends ProjectOutput {
+export interface ProjectDetailOutput {
+  id: string;
+  name: string;
+  createdAt: Date;
   userRole: 'owner' | 'EDITOR' | 'VIEWER';
 }

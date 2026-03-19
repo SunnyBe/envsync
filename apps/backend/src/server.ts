@@ -2,6 +2,20 @@ import 'dotenv/config';
 import app from './app';
 import logger from './infrastructure/logger';
 
+// Validate required env vars before binding to a port — fail fast with a clear message.
+const missing: string[] = [];
+if (!process.env.DATABASE_URL) missing.push('DATABASE_URL');
+if (!process.env.ENV_SYNC_SECRET) {
+  missing.push('ENV_SYNC_SECRET');
+} else if (!/^[0-9a-fA-F]{64}$/.test(process.env.ENV_SYNC_SECRET)) {
+  logger.error('ENV_SYNC_SECRET must be exactly 64 hex characters (32 bytes)');
+  process.exit(1);
+}
+if (missing.length > 0) {
+  logger.error({ missing }, 'Missing required environment variables');
+  process.exit(1);
+}
+
 const PORT = process.env.PORT ?? 3001;
 
 const server = app.listen(PORT, () => {

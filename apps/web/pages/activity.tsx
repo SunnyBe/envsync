@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/context/AuthContext';
 import { useLocale } from '@/context/LocaleContext';
-import { getAuditEvents, getProjects, AuditEvent, Project } from '@/lib/api';
+import { getAuditEvents, getProjects, AuditEvent, AuditPage, Project } from '@/lib/api';
 import { Layout } from '@/components/Layout';
 import { Spinner } from '@/components/ui/Spinner';
 
@@ -116,9 +116,7 @@ function getActionIcon(action: string): JSX.Element {
 function formatRelativeTime(dateStr: string, locale: string): string {
   const date = new Date(dateStr);
   const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);
-
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-
   if (diffSec < 60) return rtf.format(-diffSec, 'second');
   if (diffSec < 3600) return rtf.format(-Math.floor(diffSec / 60), 'minute');
   if (diffSec < 86400) return rtf.format(-Math.floor(diffSec / 3600), 'hour');
@@ -141,6 +139,21 @@ function groupEventsByDate(events: AuditEvent[], locale: string): Record<string,
   return groups;
 }
 
+const ALL_ACTIONS = [
+  'project.create',
+  'project.delete',
+  'project.rename',
+  'env.push',
+  'env.pull',
+  'env.delete',
+  'auth.regenerate_token',
+  'project.invite_member',
+  'project.remove_member',
+  'project.accept_invite',
+];
+
+const SOURCES = ['cli', 'web', 'manual'] as const;
+
 export default function ActivityPage() {
   const { token, isReady } = useAuth();
   const router = useRouter();
@@ -148,15 +161,27 @@ export default function ActivityPage() {
   const tActions = useTranslations('activity.actions');
   const { locale } = useLocale();
 
+  const [actionFilter, setActionFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('');
+
   useEffect(() => {
     if (isReady && !token) router.replace('/login');
   }, [isReady, token, router]);
 
-  const { data: events, isLoading } = useQuery({
-    queryKey: ['auditEvents'],
-    queryFn: getAuditEvents,
-    enabled: !!token,
-  });
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery<AuditPage>({
+      queryKey: ['auditEvents', actionFilter, sourceFilter],
+      queryFn: ({ pageParam }) =>
+        getAuditEvents({
+          cursor: pageParam as string | undefined,
+          action: actionFilter || undefined,
+          source: sourceFilter || undefined,
+          limit: 25,
+        }),
+      initialPageParam: undefined,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      enabled: !!token,
+    });
 
   const { data: projects } = useQuery({
     queryKey: ['projects'],
@@ -171,15 +196,50 @@ export default function ActivityPage() {
 
   if (!isReady || !token) return null;
 
-  const grouped = groupEventsByDate(events ?? [], locale);
+  const allEvents = data?.pages.flatMap((p) => p.events) ?? [];
+  const grouped = groupEventsByDate(allEvents, locale);
   const dateKeys = Object.keys(grouped);
 
   return (
     <Layout>
       <div className="mx-auto max-w-3xl px-8 py-8">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
           <p className="mt-1 text-sm text-gray-500">{t('subtitle')}</p>
+        </div>
+
+        {/* Filters */}
+        <div className="mb-6 flex gap-3">
+          <select
+            value={actionFilter}
+            onChange={(e) => setActionFilter(e.target.value)}
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">{t('filter.allActions')}</option>
+            {ALL_ACTIONS.map((a) => (
+              <option key={a} value={a}>
+                {(() => {
+                  try {
+                    return tActions(a as Parameters<typeof tActions>[0]);
+                  } catch {
+                    return a;
+                  }
+                })()}
+              </option>
+            ))}
+          </select>
+          <select
+            value={sourceFilter}
+            onChange={(e) => setSourceFilter(e.target.value)}
+            className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">{t('filter.allSources')}</option>
+            {SOURCES.map((s) => (
+              <option key={s} value={s}>
+                {t(`source.${s}`)}
+              </option>
+            ))}
+          </select>
         </div>
 
         {isLoading ? (
@@ -275,6 +335,20 @@ export default function ActivityPage() {
                 </div>
               </div>
             ))}
+
+            {/* Load more */}
+            {hasNextPage && (
+              <div className="flex justify-center pt-2">
+                <button
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isFetchingNextPage ? <Spinner size="sm" /> : null}
+                  {t('loadMore')}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

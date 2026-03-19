@@ -30,8 +30,9 @@ export async function inviteMember(
   }
 
   const inviteToken = crypto.randomBytes(16).toString('hex');
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
   await prisma.projectMember.create({
-    data: { projectId, email, role, inviteToken },
+    data: { projectId, email, role, inviteToken, expiresAt },
   });
 
   await recordAudit({
@@ -56,6 +57,10 @@ export async function acceptInvite(
 
   if (!member || member.acceptedAt) {
     throw new AppError('Invite not found or already accepted', 404);
+  }
+
+  if (member.expiresAt && member.expiresAt < new Date()) {
+    throw new AppError('This invite link has expired', 410);
   }
 
   if (member.email !== userEmail) {
@@ -105,6 +110,7 @@ export async function listMembers(projectId: string, requesterId: string) {
     accepted: !!m.acceptedAt,
     userId: m.userId,
     createdAt: m.createdAt,
+    // inviteToken intentionally omitted — never expose to clients
   }));
 }
 
@@ -115,7 +121,7 @@ export async function removeMember(
 ): Promise<void> {
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
-  if (!project || project.ownerId !== ownerId) {
+  if (!project || !project.isActive || project.ownerId !== ownerId) {
     throw new AppError('Project not found', 404);
   }
 

@@ -31,6 +31,7 @@ export interface Project {
   id: string;
   name: string;
   createdAt: string;
+  role: 'owner' | 'EDITOR' | 'VIEWER';
 }
 
 export interface ProjectDetail extends Project {
@@ -109,8 +110,20 @@ export interface AuditEvent {
   createdAt: string;
 }
 
-export const getAuditEvents = () =>
-  apiClient.get<{ events: AuditEvent[] }>('/audit').then((r) => r.data.events);
+export interface AuditPage {
+  events: AuditEvent[];
+  nextCursor: string | null;
+}
+
+export interface AuditQueryParams {
+  limit?: number;
+  cursor?: string;
+  action?: string;
+  source?: string;
+}
+
+export const getAuditEvents = (params: AuditQueryParams = {}) =>
+  apiClient.get<AuditPage>('/audit', { params }).then((r) => r.data);
 
 // ── Members ───────────────────────────────────────────────────────────────────
 
@@ -118,8 +131,8 @@ export interface ProjectMember {
   id: string;
   email: string;
   role: 'EDITOR' | 'VIEWER';
-  acceptedAt: string | null;
-  inviteToken: string;
+  accepted: boolean;
+  userId: string | null;
   createdAt: string;
 }
 

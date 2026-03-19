@@ -689,12 +689,12 @@ export default function ProjectPage() {
                         <td className="px-4 py-3">
                           <span
                             className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                              member.acceptedAt
+                              member.accepted
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-yellow-100 text-yellow-700'
                             }`}
                           >
-                            {member.acceptedAt ? tMembers('accepted') : tMembers('pending')}
+                            {member.accepted ? tMembers('accepted') : tMembers('pending')}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right">

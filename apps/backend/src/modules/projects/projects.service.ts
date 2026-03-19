@@ -30,7 +30,7 @@ export async function createProject(input: CreateProjectInput): Promise<ProjectO
     metadata: { name },
   });
 
-  return { id: project.id, name: project.name, createdAt: project.createdAt };
+  return { id: project.id, name: project.name, createdAt: project.createdAt, role: 'owner' };
 }
 
 export async function deleteProject(projectId: string, ownerId: string): Promise<void> {
@@ -82,7 +82,7 @@ export async function renameProject(
     metadata: { oldName: project.name, newName },
   });
 
-  return { id: updated.id, name: updated.name, createdAt: updated.createdAt };
+  return { id: updated.id, name: updated.name, createdAt: updated.createdAt, role: 'owner' };
 }
 
 export async function getProject(projectId: string, userId: string): Promise<ProjectDetailOutput> {
@@ -112,16 +112,37 @@ export async function getProject(projectId: string, userId: string): Promise<Pro
   };
 }
 
-export async function listProjects(ownerId: string): Promise<ProjectOutput[]> {
-  const projects = await prisma.project.findMany({
-    where: { ownerId, isActive: true },
-    orderBy: { createdAt: 'desc' },
-  });
-  return projects.map(
-    (p: { id: string; name: string; createdAt: Date }): ProjectOutput => ({
-      id: p.id,
-      name: p.name,
-      createdAt: p.createdAt,
+export async function listProjects(userId: string): Promise<ProjectOutput[]> {
+  const [owned, memberships] = await Promise.all([
+    prisma.project.findMany({
+      where: { ownerId: userId, isActive: true },
+      orderBy: { createdAt: 'desc' },
     }),
-  );
+    prisma.projectMember.findMany({
+      where: { userId, acceptedAt: { not: null } },
+      include: { project: true },
+    }),
+  ]);
+
+  const result: ProjectOutput[] = owned.map((p) => ({
+    id: p.id,
+    name: p.name,
+    createdAt: p.createdAt,
+    role: 'owner' as const,
+  }));
+
+  const ownedIds = new Set(owned.map((p) => p.id));
+
+  for (const m of memberships) {
+    if (!m.project.isActive || ownedIds.has(m.project.id)) continue;
+    result.push({
+      id: m.project.id,
+      name: m.project.name,
+      createdAt: m.project.createdAt,
+      role: m.role as 'EDITOR' | 'VIEWER',
+    });
+  }
+
+  result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  return result;
 }

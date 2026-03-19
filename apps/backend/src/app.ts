@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 import rateLimit from 'express-rate-limit';
 
@@ -21,6 +22,10 @@ import { metricsMiddleware } from './modules/metrics/metrics.middleware';
 
 const app = express();
 
+// Trust the first proxy hop (Railway, Heroku, etc.) so req.ip reflects the real client IP,
+// which is required for rate limiting to work correctly.
+app.set('trust proxy', 1);
+
 // General rate limiter: 100 requests per 15 minutes
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -37,6 +42,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+app.use(helmet());
 app.use(requestIdMiddleware);
 app.use(requestContextMiddleware);
 app.use(pinoHttp({ logger }));

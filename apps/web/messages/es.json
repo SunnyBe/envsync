@@ -65,7 +65,11 @@
     "toast": {
       "created": "Proyecto «{name}» creado",
       "deleted": "Proyecto eliminado"
-    }
+    },
+    "sectionOwned": "Tus proyectos",
+    "sectionShared": "Compartidos contigo",
+    "roleEditor": "Editor",
+    "roleViewer": "Visor"
   },
   "project": {
     "breadcrumb": "Proyectos",
@@ -211,6 +215,11 @@
       "member.invite": "Miembro invitado",
       "member.remove": "Miembro eliminado",
       "member.accept": "Invitación aceptada"
+    },
+    "loadMore": "Cargar más",
+    "filter": {
+      "allActions": "Todas las acciones",
+      "allSources": "Todas las fuentes"
     }
   },
   "members": {
