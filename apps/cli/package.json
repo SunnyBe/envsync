@@ -1,6 +1,6 @@
 {
   "name": "@ndusunday/envsync",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Sync environment variables across your team — CLI tool",
   "license": "MIT",
   "private": false,

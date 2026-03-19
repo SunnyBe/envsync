@@ -9,6 +9,7 @@ interface Project {
   id: string;
   name: string;
   createdAt: string;
+  role: 'owner' | 'EDITOR' | 'VIEWER';
 }
 
 // ── list ──────────────────────────────────────────────────────────────────────
@@ -29,12 +30,20 @@ const listSubcommand = new Command('list')
       }
 
       console.log(
-        chalk.bold('\n  NAME                ID                                    CREATED'),
+        chalk.bold(
+          '\n  NAME                ROLE     ID                                    CREATED',
+        ),
       );
-      console.log(chalk.dim('  ' + '─'.repeat(72)));
+      console.log(chalk.dim('  ' + '─'.repeat(80)));
       for (const p of projects) {
         const date = new Date(p.createdAt).toLocaleDateString();
-        console.log(`  ${p.name.padEnd(20)}${chalk.cyan(p.id)}  ${chalk.dim(date)}`);
+        const roleLabel =
+          p.role === 'owner'
+            ? chalk.green('owner   ')
+            : p.role === 'EDITOR'
+              ? chalk.yellow('editor  ')
+              : chalk.dim('viewer  ');
+        console.log(`  ${p.name.padEnd(20)}${roleLabel} ${chalk.cyan(p.id)}  ${chalk.dim(date)}`);
       }
       console.log();
     } catch (err) {
