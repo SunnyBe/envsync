@@ -9,7 +9,12 @@
  * (DATABASE_URL, API keys, API base URLs, etc.).
  */
 export const config = {
+  app: {
+    name: 'EnvSync',
+    npmPackage: '@ndusunday/envsync',
+  },
   links: {
+    github: 'https://github.com/SunnyBe/envsync',
     docs: 'https://github.com/SunnyBe/envsync#readme',
     issues: 'https://github.com/SunnyBe/envsync/issues/new',
     contact: 'ndusunday@gmail.com',

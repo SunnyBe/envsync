@@ -7,6 +7,7 @@ import { loadConfig } from '../config/config';
 import { writeEnvFile } from '../utils/envParser';
 import { handleError } from '../utils/error';
 import { VALID_ENVIRONMENTS, Environment } from '../utils/environments';
+import { resolveProject } from '../utils/resolveProject';
 
 interface PullOptions {
   project: string;
@@ -22,9 +23,10 @@ export async function runPull(opts: PullOptions): Promise<void> {
   }
 
   const config = loadConfig();
+  const projectId = await resolveProject(opts.project, config);
 
   const { data } = await axios.get<{ variables: Record<string, string> }>(
-    `${config.apiUrl}/projects/${opts.project}/env`,
+    `${config.apiUrl}/projects/${projectId}/env`,
     {
       params: { env: opts.env },
       headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` },
@@ -45,7 +47,7 @@ export async function runPull(opts: PullOptions): Promise<void> {
 
 export const pullCommand = new Command('pull')
   .description('Pull variables from EnvSync into a local .env file')
-  .requiredOption('--project <projectId>', 'Project ID')
+  .requiredOption('--project <name|id>', 'Project name or ID')
   .requiredOption('--env <environment>', `Target environment (${VALID_ENVIRONMENTS.join('|')})`)
   .option('--file <path>', 'Output .env file path', '.env')
   .action((opts: PullOptions) => runPull(opts).catch(handleError));

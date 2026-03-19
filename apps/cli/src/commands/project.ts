@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { CLI_SOURCE_HEADER } from '../lib/api';
 import { loadConfig } from '../config/config';
 import { handleError } from '../utils/error';
+import { resolveProject } from '../utils/resolveProject';
 
 interface Project {
   id: string;
@@ -76,10 +77,11 @@ const createSubcommand = new Command('create')
 
 const getSubcommand = new Command('get')
   .description('Show details for a project')
-  .argument('<id>', 'Project ID')
-  .action(async (id: string) => {
+  .argument('<name|id>', 'Project name or ID')
+  .action(async (nameOrId: string) => {
     try {
       const config = loadConfig();
+      const id = await resolveProject(nameOrId, config);
       const res = await axios.get<Project>(`${config.apiUrl}/projects/${id}`, {
         headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` },
       });
@@ -96,11 +98,12 @@ const getSubcommand = new Command('get')
 
 const updateSubcommand = new Command('update')
   .description('Rename a project')
-  .argument('<id>', 'Project ID')
+  .argument('<name|id>', 'Project name or ID')
   .requiredOption('--name <name>', 'New project name')
-  .action(async (id: string, opts: { name: string }) => {
+  .action(async (nameOrId: string, opts: { name: string }) => {
     try {
       const config = loadConfig();
+      const id = await resolveProject(nameOrId, config);
       const res = await axios.patch<Project>(
         `${config.apiUrl}/projects/${id}`,
         { name: opts.name },
@@ -116,10 +119,11 @@ const updateSubcommand = new Command('update')
 
 const deleteSubcommand = new Command('delete')
   .description('Delete a project')
-  .argument('<id>', 'Project ID')
-  .action(async (id: string) => {
+  .argument('<name|id>', 'Project name or ID')
+  .action(async (nameOrId: string) => {
     try {
       const config = loadConfig();
+      const id = await resolveProject(nameOrId, config);
       await axios.delete(`${config.apiUrl}/projects/${id}`, {
         headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` },
       });

@@ -7,6 +7,7 @@ import { loadConfig } from '../config/config';
 import { parseEnvFile } from '../utils/envParser';
 import { handleError } from '../utils/error';
 import { VALID_ENVIRONMENTS, Environment } from '../utils/environments';
+import { resolveProject } from '../utils/resolveProject';
 
 interface PushOptions {
   project: string;
@@ -22,6 +23,7 @@ export async function runPush(opts: PushOptions): Promise<void> {
   }
 
   const config = loadConfig();
+  const projectId = await resolveProject(opts.project, config);
   const filePath = path.resolve(opts.file);
   const variables = parseEnvFile(filePath);
   const count = Object.keys(variables).length;
@@ -31,7 +33,7 @@ export async function runPush(opts: PushOptions): Promise<void> {
   }
 
   await axios.post(
-    `${config.apiUrl}/projects/${opts.project}/env`,
+    `${config.apiUrl}/projects/${projectId}/env`,
     { variables },
     {
       params: { env: opts.env },
@@ -47,7 +49,7 @@ export async function runPush(opts: PushOptions): Promise<void> {
 
 export const pushCommand = new Command('push')
   .description('Push local .env variables to EnvSync')
-  .requiredOption('--project <projectId>', 'Project ID')
+  .requiredOption('--project <name|id>', 'Project name or ID')
   .requiredOption('--env <environment>', `Target environment (${VALID_ENVIRONMENTS.join('|')})`)
   .option('--file <path>', 'Path to .env file', '.env')
   .action((opts: PushOptions) => runPush(opts).catch(handleError));

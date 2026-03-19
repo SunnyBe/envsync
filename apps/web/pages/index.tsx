@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { config as appConfig } from '@/config';
 
 const FEATURES = [
   {
@@ -164,7 +165,7 @@ export default function IndexPage() {
               Get started free
             </Link>
             <a
-              href="https://github.com/ndusunday/envsync"
+              href={appConfig.links.github}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-xl border border-gray-200 px-8 py-3.5 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:bg-gray-50"
@@ -193,7 +194,7 @@ export default function IndexPage() {
                 <span className="text-gray-500"># Install once</span>
                 {'\n'}
                 <span className="text-green-400">$</span>
-                <span className="text-white"> npm install -g @ndusunday/envsync</span>
+                <span className="text-white"> npm install -g {appConfig.app.npmPackage}</span>
                 {'\n\n'}
                 <span className="text-gray-500"># Authenticate with your API token</span>
                 {'\n'}
@@ -305,7 +306,7 @@ export default function IndexPage() {
               Sign in
             </Link>
             <a
-              href="https://github.com/ndusunday/envsync"
+              href={appConfig.links.github}
               target="_blank"
               rel="noopener noreferrer"
               className="transition-colors hover:text-gray-600"
