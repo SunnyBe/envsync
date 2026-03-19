@@ -29,9 +29,13 @@ afterEach(() => {
 
 describe('runPush', () => {
   it('calls the correct API endpoint', async () => {
-    await runPush({ project: 'proj-123', env: 'development', file: envFile });
+    await runPush({
+      project: '550e8400-e29b-41d4-a716-446655440001',
+      env: 'development',
+      file: envFile,
+    });
     expect(mockedAxios.post).toHaveBeenCalledWith(
-      'http://localhost:3001/projects/proj-123/env',
+      'http://localhost:3001/projects/550e8400-e29b-41d4-a716-446655440001/env',
       { variables: { DB_URL: 'postgres://localhost/test', SECRET: 'abc123' } },
       expect.objectContaining({
         headers: expect.objectContaining({
@@ -44,7 +48,11 @@ describe('runPush', () => {
   });
 
   it('sends the correct variables from the .env file', async () => {
-    await runPush({ project: 'proj-123', env: 'staging', file: envFile });
+    await runPush({
+      project: '550e8400-e29b-41d4-a716-446655440001',
+      env: 'staging',
+      file: envFile,
+    });
     const [, body] = (mockedAxios.post as jest.Mock).mock.calls[0];
     expect(body.variables).toHaveProperty('DB_URL');
     expect(body.variables).toHaveProperty('SECRET');
@@ -52,13 +60,21 @@ describe('runPush', () => {
 
   it('rejects an invalid environment', async () => {
     await expect(
-      runPush({ project: 'proj-123', env: 'production-bad', file: envFile }),
+      runPush({
+        project: '550e8400-e29b-41d4-a716-446655440001',
+        env: 'production-bad',
+        file: envFile,
+      }),
     ).rejects.toThrow('Invalid environment');
   });
 
   it('rejects a missing .env file', async () => {
     await expect(
-      runPush({ project: 'proj-123', env: 'development', file: path.join(tmpDir, 'missing.env') }),
+      runPush({
+        project: '550e8400-e29b-41d4-a716-446655440001',
+        env: 'development',
+        file: path.join(tmpDir, 'missing.env'),
+      }),
     ).rejects.toThrow('File not found');
   });
 
@@ -66,7 +82,11 @@ describe('runPush', () => {
     const emptyFile = path.join(tmpDir, 'empty.env');
     fs.writeFileSync(emptyFile, '');
     await expect(
-      runPush({ project: 'proj-123', env: 'development', file: emptyFile }),
+      runPush({
+        project: '550e8400-e29b-41d4-a716-446655440001',
+        env: 'development',
+        file: emptyFile,
+      }),
     ).rejects.toThrow('No variables found');
   });
 });

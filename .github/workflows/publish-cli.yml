@@ -6,7 +6,7 @@ on:
       dry_run:
         description: 'Dry run — build and pack without publishing'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 jobs:

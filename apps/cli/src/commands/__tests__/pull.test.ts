@@ -29,9 +29,13 @@ afterEach(() => {
 describe('runPull', () => {
   it('calls the correct API endpoint', async () => {
     const outFile = path.join(tmpDir, '.env');
-    await runPull({ project: 'proj-456', env: 'production', file: outFile });
+    await runPull({
+      project: '550e8400-e29b-41d4-a716-446655440002',
+      env: 'production',
+      file: outFile,
+    });
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      'http://localhost:3001/projects/proj-456/env',
+      'http://localhost:3001/projects/550e8400-e29b-41d4-a716-446655440002/env',
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: 'Bearer test-token',
@@ -44,7 +48,11 @@ describe('runPull', () => {
 
   it('writes the pulled variables to the output file', async () => {
     const outFile = path.join(tmpDir, '.env');
-    await runPull({ project: 'proj-456', env: 'staging', file: outFile });
+    await runPull({
+      project: '550e8400-e29b-41d4-a716-446655440002',
+      env: 'staging',
+      file: outFile,
+    });
     const contents = fs.readFileSync(outFile, 'utf8');
     expect(contents).toContain('API_KEY=secret');
     expect(contents).toContain('PORT=3000');
@@ -52,7 +60,11 @@ describe('runPull', () => {
 
   it('rejects an invalid environment', async () => {
     await expect(
-      runPull({ project: 'proj-456', env: 'dev', file: path.join(tmpDir, '.env') }),
+      runPull({
+        project: '550e8400-e29b-41d4-a716-446655440002',
+        env: 'dev',
+        file: path.join(tmpDir, '.env'),
+      }),
     ).rejects.toThrow('Invalid environment');
   });
 });
