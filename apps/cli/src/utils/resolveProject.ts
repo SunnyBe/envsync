@@ -21,10 +21,16 @@ export async function resolveProject(nameOrId: string, config: Config): Promise<
     headers: { ...CLI_SOURCE_HEADER, Authorization: `Bearer ${config.token}` },
   });
 
-  const match = res.data.projects.find((p) => p.name.toLowerCase() === nameOrId.toLowerCase());
+  const projects = res.data?.projects ?? [];
+
+  const match = projects.find((p) => p.name.toLowerCase() === nameOrId.toLowerCase());
 
   if (!match) {
-    throw new Error(`Project "${nameOrId}" not found. Run: envsync project list`);
+    const names = projects.map((p) => `"${p.name}"`).join(', ');
+    throw new Error(
+      `Project "${nameOrId}" not found.` +
+        (names ? `\n  Available: ${names}` : '\n  No projects found — run: envsync project list'),
+    );
   }
 
   return match.id;

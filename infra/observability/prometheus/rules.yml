@@ -1,0 +1,61 @@
+groups:
+  - name: envsync-backend
+    interval: 30s
+    rules:
+      # Backend unreachable — Prometheus cannot scrape the /metrics endpoint
+      - alert: BackendDown
+        expr: up{job="envsync-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'EnvSync backend is down'
+          description: 'Prometheus cannot scrape the backend. The service may have crashed.'
+
+      # More than 5% of requests return 5xx over the last 5 minutes
+      - alert: HighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{app="envsync-backend", status_code=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{app="envsync-backend"}[5m]))
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High 5xx error rate'
+          description: 'More than 5% of requests are returning server errors (current: {{ $value | humanizePercentage }}).'
+
+      # p99 latency above 1 second
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(
+            0.99,
+            sum(rate(http_request_duration_seconds_bucket{app="envsync-backend"}[5m])) by (le)
+          ) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High p99 latency'
+          description: 'p99 request latency is above 1 s (current: {{ $value | humanizeDuration }}).'
+
+      # Heap usage above 80% of total, with a 50 MB floor to ignore startup spikes.
+      # At startup V8 begins with a small heap so used/total can briefly spike above
+      # 80% before the engine expands the pool — this condition filters that noise.
+      - alert: HighMemoryUsage
+        expr: |
+          (
+            nodejs_heap_size_used_bytes{app="envsync-backend"}
+            /
+            nodejs_heap_size_total_bytes{app="envsync-backend"}
+          ) > 0.80
+          and
+          nodejs_heap_size_total_bytes{app="envsync-backend"} > 50 * 1024 * 1024
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High Node.js heap usage'
+          description: 'Heap is above 80% of total allocated (current: {{ $value | humanizePercentage }}).'

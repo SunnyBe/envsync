@@ -4,5 +4,5 @@ metadata:
   name: envsync-config
   namespace: envsync # must match the namespace in the namespace.yml file
 data:
-  PORT: "3001"
-  NODE_ENV: "development"
+  PORT: '3001'
+  NODE_ENV: 'development'

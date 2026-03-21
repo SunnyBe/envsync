@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: envsync-backend # Send traffic to pods with this label
-  
+
   template:
     metadata:
       labels:
@@ -17,13 +17,13 @@ spec:
       containers:
         - name: envsync-backend
           image: envsync-backend:local
-          imagePullPolicy: Never   # Use local minikube image — don't attempt Docker Hub
+          imagePullPolicy: Never # Use local minikube image — don't attempt Docker Hub
           ports:
             - containerPort: 3001
           envFrom:
             - configMapRef:
                 name: envsync-config
-          
+
           env:
             - name: ENV_SYNC_SECRET
               valueFrom:
@@ -38,11 +38,11 @@ spec:
 
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: '100m'
+              memory: '128Mi'
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: '500m'
+              memory: '512Mi'
 
           livenessProbe: # failure allows kubernetes to restart the pod
             httpGet:

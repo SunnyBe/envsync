@@ -12,9 +12,13 @@ const router = Router();
 router.get('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const secret = process.env.METRICS_SECRET;
-    if (secret && req.headers['x-metrics-token'] !== secret) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
+    if (secret) {
+      const auth = req.headers['authorization'] ?? '';
+      const provided = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+      if (provided !== secret) {
+        res.status(401).json({ error: 'Unauthorized' });
+        return;
+      }
     }
     res.set('Content-Type', registry.contentType);
     res.end(await registry.metrics());

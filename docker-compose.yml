@@ -19,6 +19,8 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-envsync}:${POSTGRES_PASSWORD:-envsync}@db:5432/envsync
       ENV_SYNC_SECRET: ${ENV_SYNC_SECRET}
+      METRICS_SECRET: ${METRICS_SECRET:-}
+      HEALTH_SECRET: ${HEALTH_SECRET:-}
       PORT: 3001
     depends_on:
       - db
@@ -37,16 +39,26 @@ services:
   prometheus:
     image: prom/prometheus:v2.51.0
     volumes:
-      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/observability/prometheus/rules.yml:/etc/prometheus/rules.yml:ro
       - prometheus_data:/prometheus
+    environment:
+      METRICS_SECRET: ${METRICS_SECRET:-}
     ports:
       - '9090:9090'
     depends_on:
       - backend
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=7d'
+    # Prometheus config uses credentials_file, not env vars — write the value
+    # from the environment into a file at startup, then hand off to Prometheus.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        printf '%s' "$$METRICS_SECRET" > /etc/prometheus/metrics_secret
+        exec /bin/prometheus \
+          --config.file=/etc/prometheus/prometheus.yml \
+          --storage.tsdb.path=/prometheus \
+          --storage.tsdb.retention.time=7d
 
   grafana:
     image: grafana/grafana:10.4.0
@@ -57,8 +69,8 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: 'false'
     volumes:
-      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./infra/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus

@@ -22,10 +22,6 @@ RUN npx prisma generate
 
 RUN npm run build
 
-# Copy and permission the startup script
-COPY apps/backend/start.sh ./start.sh
-RUN chmod +x ./start.sh
-
 EXPOSE 3001
 
-CMD ["./start.sh"]
+CMD ["sh", "-c", "npx prisma migrate deploy && exec node dist/server.js"]
