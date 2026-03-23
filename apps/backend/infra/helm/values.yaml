@@ -1,0 +1,23 @@
+# Default values for envsync chart.
+replicaCount: 2
+
+image:
+  repository: envsync-backend
+  tag: local
+  pullPolicy: Never # Other options: Always, IfNotPresent
+
+config:
+  nodeEnv: development
+  targetPort: 3001
+  allowedOrigins: http://localhost:3000
+  healthSecret: test-health-secret
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+ingress:
+  host: envsync.local
