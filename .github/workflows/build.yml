@@ -102,11 +102,15 @@ jobs:
           # GITHUB_TOKEN is automatically provided — no manual secret needed
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase owner
+        id: owner
+        run: echo "value=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Extract backend image metadata (tags + labels)
         id: meta-backend
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/envsync-backend
+          images: ghcr.io/${{ steps.owner.outputs.value }}/envsync-backend
           tags: |
             # On every merge to main: tag with short git SHA for exact traceability
             type=sha,format=short
@@ -129,7 +133,7 @@ jobs:
         id: meta-web
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/envsync-web
+          images: ghcr.io/${{ steps.owner.outputs.value }}/envsync-web
           tags: |
             type=sha,format=short
             type=semver,pattern={{version}}
@@ -210,10 +214,11 @@ jobs:
       - name: Deploy via Helm
         run: |
           IMAGE_TAG="sha-$(echo "${{ github.sha }}" | cut -c1-7)"
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           helm upgrade --install envsync apps/backend/infra/helm \
             --namespace production \
             --create-namespace \
-            --set image.repository=ghcr.io/${{ github.repository_owner }}/envsync-backend \
+            --set image.repository=ghcr.io/${OWNER}/envsync-backend \
             --set image.tag=${IMAGE_TAG} \
             --set image.pullPolicy=IfNotPresent \
             --set postgresql.auth.database=envsync-production-db \
