@@ -165,7 +165,12 @@ jobs:
         run: npm install
 
       - name: Run Prisma migrations
-        run: npx prisma migrate deploy
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "STAGING_DATABASE_URL is not configured — skipping migrations"
+            exit 0
+          fi
+          npx prisma migrate deploy
         working-directory: apps/backend
         env:
           DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
