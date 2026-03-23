@@ -167,7 +167,7 @@ jobs:
       - name: Run Prisma migrations
         run: |
           if [ -z "$DATABASE_URL" ]; then
-            echo "STAGING_DATABASE_URL is not configured — skipping migrations"
+            echo "Skipping migrations: DATABASE_URL is empty (populated from the STAGING_DATABASE_URL GitHub Actions secret, which is not yet configured)"
             exit 0
           fi
           npx prisma migrate deploy
