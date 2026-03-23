@@ -30,8 +30,13 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Name }}-secret"
                   key: ENV_SYNC_SECRET
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: envsync-postgresql
+                  key: password
             - name: DATABASE_URL
-              value: "postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.auth.database }}"
+              value: "postgresql://{{ .Values.postgresql.auth.username }}:$(DB_PASSWORD)@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.auth.database }}"
 
           resources:
             requests:

@@ -145,6 +145,43 @@ jobs:
           tags: ${{ steps.meta-web.outputs.tags }}
           labels: ${{ steps.meta-web.outputs.labels }}
 
+  deploy-gke:
+    name: Deploy to GKE
+    runs-on: ubuntu-latest
+    needs: publish
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ vars.GKE_CLUSTER }}
+          location: ${{ vars.GKE_ZONE }}
+          project_id: ${{ vars.GCP_PROJECT }}
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Deploy via Helm
+        run: |
+          IMAGE_TAG="sha-$(echo "${{ github.sha }}" | cut -c1-7)"
+          helm upgrade --install envsync apps/backend/infra/helm \
+            --namespace production \
+            --create-namespace \
+            --set image.repository=ghcr.io/${{ github.repository_owner }}/envsync-backend \
+            --set image.tag=${IMAGE_TAG} \
+            --set image.pullPolicy=IfNotPresent \
+            --set postgresql.auth.database=envsync-production-db \
+            --wait \
+            --timeout 5m
+
   migrate:
     name: Run DB migrations
     runs-on: ubuntu-latest

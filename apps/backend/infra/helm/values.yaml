@@ -25,8 +25,14 @@ ingress:
 postgresql:
   auth:
     username: envsync
-    password: envsync
-    database: envsync
+    database: envsync-db
+    # password is NOT stored here — provide it via an existing K8s Secret.
+    # For local dev: kubectl create secret generic envsync-postgresql \
+    #   --namespace <your-namespace> --from-literal=password=envsync
+    # For production: create the secret imperatively on the cluster before deploying.
+    existingSecret: envsync-postgresql
+    secretKeys:
+      userPasswordKey: password
   primary:
     service:
       ports:
