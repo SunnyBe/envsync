@@ -149,7 +149,8 @@ jobs:
     name: Run DB migrations (Staging)
     runs-on: ubuntu-latest
     needs: publish
-    # Runs on every merge to main — migrates Railway's external PostgreSQL before staging deploy
+    # Runs on every merge to main — migrates Railway's external PostgreSQL.
+    # Railway auto-deploy handles the actual staging deploy via GitHub integration.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
@@ -174,30 +175,6 @@ jobs:
         working-directory: apps/backend
         env:
           DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
-
-  deploy-staging:
-    name: Deploy to Railway (Staging)
-    runs-on: ubuntu-latest
-    needs: [publish, migrate-staging]
-    # Runs on every merge to main — internal testing before promoting to production
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    environment: staging
-
-    steps:
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli@latest
-
-      - name: Deploy backend service
-        run: railway redeploy --service "${{ vars.RAILWAY_BACKEND_SERVICE }}" --yes
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
-
-      - name: Deploy web service
-        run: railway redeploy --service "${{ vars.RAILWAY_WEB_SERVICE }}" --yes
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
 
   deploy-production:
     name: Deploy to GKE (Production)
