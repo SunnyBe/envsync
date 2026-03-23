@@ -6,7 +6,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}
 spec:
-  type: ClusterIP # Internal only - not accessible from outside
+  type: LoadBalancer # GCP provisions an external load balancer with a public IP
   selector:
     app: {{ .Release.Name }} # Send traffic to pods with this label (matches our deployment label)
   ports:
