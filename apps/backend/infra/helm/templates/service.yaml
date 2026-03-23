@@ -3,10 +3,13 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
 spec:
   type: ClusterIP # Internal only - not accessible from outside
   selector:
     app: {{ .Release.Name }} # Send traffic to pods with this label (matches our deployment label)
   ports:
-    - port: 80 # Port the service listens on (inside the cluster)
+    - name: http
+      port: 80 # Port the service listens on (inside the cluster)
       targetPort: {{ .Values.config.targetPort }} # Port the container is running on

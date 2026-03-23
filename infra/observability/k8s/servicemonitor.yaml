@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: envsync-backend
+  namespace: monitoring
+  labels:
+    release: monitoring # Required by kube-prometheus-stack. Must match the Helm release name
+spec:
+  namespaceSelector:
+    matchNames:
+      - envsync
+  selector:
+    matchLabels:
+      app: envsync # matches our Service label
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

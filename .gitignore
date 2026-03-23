@@ -48,3 +48,9 @@ infra/k8s/secret.yml
 # Helm charts
 apps/backend/infra/helm/charts/
 
+# Local scripts
+scripts/
+
+# Temporary files
+temp/
+
