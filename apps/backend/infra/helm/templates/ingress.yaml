@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: { { .Release.Name } }
-  namespace: { { .Release.Namespace } }
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
 spec:
   ingressClassName: nginx # Use the nginx ingress controller that we enabled in minikube
   rules:
-    - host: { { .Values.ingress.host } } # We'll map this to minikube's IP address in /etc/hosts
+    - host: {{ .Values.ingress.host }} # We'll map this to minikube's IP address in /etc/hosts
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: { { .Release.Name } } # The service we created in the service.yml file
+                name: {{ .Release.Name }} # The service we created in the service.yml file
                 port:
                   number: 80 # The service port (not the container port)

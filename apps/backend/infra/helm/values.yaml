@@ -21,3 +21,13 @@ resources:
     memory: 512Mi
 ingress:
   host: envsync.local
+
+postgresql:
+  auth:
+    username: envsync
+    password: envsync
+    database: envsync
+  primary:
+    service:
+      ports:
+        postgresql: 5432

@@ -44,3 +44,7 @@ infra/k8s/secret.yml
 
 # Claude
 .claude/
+
+# Helm charts
+apps/backend/infra/helm/charts/
+
