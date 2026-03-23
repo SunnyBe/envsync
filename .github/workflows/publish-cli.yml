@@ -33,13 +33,23 @@ jobs:
       - name: Run tests
         run: npm test --workspace=apps/cli
 
+      - name: Verify npm token is set
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::NPM_TOKEN secret is not set. Add it in Settings → Secrets → Actions."
+            exit 1
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish to npm
+        working-directory: apps/cli
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             echo "Dry run — skipping publish"
-            npm pack --workspace=apps/cli
+            npm pack
           else
-            npm publish --workspace=apps/cli --access public
+            npm publish --access public
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
