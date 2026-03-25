@@ -19,7 +19,7 @@ curl -sSfL https://raw.githubusercontent.com/SunnyBe/envsync/main/install.sh | b
 npx @ndusunday/envsync --help
 ```
 
-**Requires Node.js ≥ 18**
+> Requires Node.js ≥ 18
 
 Once installed, the command is simply `envsync` regardless of how you installed it.
 
@@ -35,6 +35,12 @@ Sign up at the [EnvSync dashboard](https://github.com/SunnyBe/envsync#readme) to
 
 ```bash
 envsync login --token YOUR_API_TOKEN
+```
+
+The CLI defaults to the hosted API at:
+
+```text
+https://envsync-backend-production.up.railway.app
 ```
 
 If you self-host EnvSync, point to your instance:
@@ -77,7 +83,7 @@ This writes (or overwrites) a `.env` file in the current directory.
 
 ### `envsync login`
 
-```
+```bash
 envsync login --token <token> [--api-url <url>]
 ```
 
@@ -102,31 +108,31 @@ Shows your current login status, configured API URL, and masked token.
 
 ### `envsync push`
 
-```
-envsync push --project <id> --env <environment> [--file <path>]
+```bash
+envsync push --project <name|id> --env <environment> [--file <path>]
 ```
 
 Reads variables from a `.env` file and uploads them to EnvSync.
 
-| Option      | Required | Description                                                    |
-| ----------- | -------- | -------------------------------------------------------------- |
-| `--project` | Yes      | Project ID (from `envsync project list` or the dashboard)      |
-| `--env`     | Yes      | Target environment: `development`, `staging`, or `production`  |
-| `--file`    | No       | Path to the `.env` file (default: `.env` in current directory) |
+| Option      | Required | Description                                                       |
+| ----------- | -------- | ----------------------------------------------------------------- |
+| `--project` | Yes      | Project name or ID (from `envsync project list` or the dashboard) |
+| `--env`     | Yes      | Target environment: `development`, `staging`, or `production`     |
+| `--file`    | No       | Path to the `.env` file (default: `.env` in current directory)    |
 
 ---
 
 ### `envsync pull`
 
-```
-envsync pull --project <id> --env <environment> [--file <path>]
+```bash
+envsync pull --project <name|id> --env <environment> [--file <path>]
 ```
 
 Downloads variables from EnvSync and writes them to a `.env` file.
 
 | Option      | Required | Description                                                   |
 | ----------- | -------- | ------------------------------------------------------------- |
-| `--project` | Yes      | Project ID                                                    |
+| `--project` | Yes      | Project name or ID                                            |
 | `--env`     | Yes      | Source environment: `development`, `staging`, or `production` |
 | `--file`    | No       | Output path (default: `.env` in current directory)            |
 
@@ -137,11 +143,11 @@ Downloads variables from EnvSync and writes them to a `.env` file.
 Manage projects from the terminal.
 
 ```bash
-envsync project list                        # List all your projects
-envsync project create <name>               # Create a new project
-envsync project get <id>                    # Show project details
-envsync project update <id> --name <name>   # Rename a project
-envsync project delete <id>                 # Delete a project
+envsync project list                              # List all your projects
+envsync project create <name>                     # Create a new project
+envsync project get <name|id>                     # Show project details
+envsync project update <name|id> --name <name>    # Rename a project
+envsync project delete <name|id>                  # Delete a project
 ```
 
 ---
